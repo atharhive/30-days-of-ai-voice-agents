@@ -34,36 +34,24 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 
 | Day | Task | Submission |
 |-----|------|-----------|
-| 1 | Project Setup & Basic Voice Recording | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 2 | Speech-to-Text Integration | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 3 | LLM Integration & Response Generation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 4 | Text-to-Speech with Murf AI | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 5 | Complete Voice Pipeline | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 6 | Error Handling & Fallbacks | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 7 | Session Management | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 8 | UI/UX Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 9 | Audio Visualizations | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 10 | Personality Development | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 11 | Performance Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 12 | Advanced Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 13 | **Documentation** ← *You are here!* | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 14 | Testing & Quality Assurance | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 15 | Security Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 16 | Mobile Responsiveness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 17 | Analytics & Monitoring | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 18 | Multi-language Support | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 19 | Voice Customization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 20 | Context Awareness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 21 | Integration Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 22 | Advanced AI Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 23 | Real-time Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 24 | Scalability Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 25 | Deployment Preparation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 26 | Production Deployment | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 27 | Load Testing & Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 28 | Final Polish & Bug Fixes | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 29 | Project Showcase | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 30 | Challenge Completion & Reflection | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 1 | Set up Python backend with Flask/FastAPI and a basic HTML+JS frontend served from the server.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-python-activity-7357411756417175552-kYRF?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 2 | Build a REST endpoint to call Murf TTS API and return generated audio URL, keeping API keys secure. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-fastapi-activity-7357808735894818816-Vh51?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 3 | Add UI input and button to send text to TTS endpoint, play returned audio in <audio> element. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-tts-activity-7357996900974800896-WFVP?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 4 | Create Echo Bot using MediaRecorder API to record and play back audio in browser. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofvoiceagents-voiceai-activity-7358453708705185792-sYig?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 5 | Upload recorded audio to server, store temporarily, and return file details in response| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-fastapi-activity-7358808304430567424-2FaS?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 6 | Transcribe uploaded audio using AssemblyAI (or similar) and show text in UI. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-voiceai-speechtotext-activity-7359230721216892931-1eYM?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 7 | Echo Bot v2 — transcribe audio, send to Murf for voice output, and play back Murf’s voice. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7359591228415361024-qhg_?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 8 | Create /llm/query endpoint to accept text, send to LLM API (Gemini), and return response. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_voicetech-murfai-geminiapi-activity-7360044310966255616-AHC-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 9 | Build full non-streaming pipeline: audio → STT → LLM → TTS → play voice output.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7360363702354694145-BP_W?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 10 | Add chat history with session IDs so LLM remembers past conversation context. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_day-10-30-days-of-ai-voice-agents-with-activity-7360741552324820994-CzqX?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 11 | Implement error handling & fallbacks for STT, LLM, and TTS failures. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_ai-voiceai-errorhandling-activity-7361058707163525120-EEJH?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 12 | Revamp conversational UI with improved styling, animations, and better recording controls.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361366706272833536-PBcT?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 13 | Create README.md with project details, architecture, features, and run instructions. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361685305843765248-PiS4?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 14 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 15 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 16 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+
+
 
 ### System Architecture
 
