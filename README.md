@@ -26,6 +26,45 @@ Think of her as your personal AI cat who happened to master human speech — and
 | ![Murf AI](https://img.shields.io/badge/Murf_AI-7B68EE?style=flat-square&logo=soundcloud&logoColor=white) | Text-to-Speech | High-quality, natural-sounding voice synthesis |
 | ![Vanilla JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | Frontend Interactions | Real-time audio recording, visualization, and seamless UX |
 
+## 🏆 30 Days of AI Voice Agents Challenge
+
+This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf AI**! 🎉
+
+### Challenge Progress
+
+| Day | Task | Submission |
+|-----|------|-----------|
+| 1 | Project Setup & Basic Voice Recording | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 2 | Speech-to-Text Integration | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 3 | LLM Integration & Response Generation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 4 | Text-to-Speech with Murf AI | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 5 | Complete Voice Pipeline | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 6 | Error Handling & Fallbacks | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 7 | Session Management | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 8 | UI/UX Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 9 | Audio Visualizations | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 10 | Personality Development | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 11 | Performance Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 12 | Advanced Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 13 | **Documentation** ← *You are here!* | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 14 | Testing & Quality Assurance | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 15 | Security Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 16 | Mobile Responsiveness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 17 | Analytics & Monitoring | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 18 | Multi-language Support | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 19 | Voice Customization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 20 | Context Awareness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 21 | Integration Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 22 | Advanced AI Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 23 | Real-time Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 24 | Scalability Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 25 | Deployment Preparation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 26 | Production Deployment | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 27 | Load Testing & Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 28 | Final Polish & Bug Fixes | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 29 | Project Showcase | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 30 | Challenge Completion & Reflection | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+
 ### System Architecture
 
 ```
@@ -179,45 +218,6 @@ The application logs helpful information to the console. Key things to watch:
 - Speech transcription results  
 - AI response generation
 - TTS audio URL generation
-
-## 🏆 30 Days of AI Voice Agents Challenge
-
-This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf AI**! 🎉
-
-### Challenge Progress
-
-| Day | Task | Submission |
-|-----|------|-----------|
-| 1 | Project Setup & Basic Voice Recording | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 2 | Speech-to-Text Integration | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 3 | LLM Integration & Response Generation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 4 | Text-to-Speech with Murf AI | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 5 | Complete Voice Pipeline | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 6 | Error Handling & Fallbacks | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 7 | Session Management | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 8 | UI/UX Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 9 | Audio Visualizations | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 10 | Personality Development | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 11 | Performance Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 12 | Advanced Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 13 | **Documentation** ← *You are here!* | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 14 | Testing & Quality Assurance | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 15 | Security Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 16 | Mobile Responsiveness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 17 | Analytics & Monitoring | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 18 | Multi-language Support | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 19 | Voice Customization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 20 | Context Awareness | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 21 | Integration Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 22 | Advanced AI Features | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 23 | Real-time Enhancements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 24 | Scalability Improvements | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 25 | Deployment Preparation | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 26 | Production Deployment | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 27 | Load Testing & Optimization | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 28 | Final Polish & Bug Fixes | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 29 | Project Showcase | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 30 | Challenge Completion & Reflection | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 
 ---
 
