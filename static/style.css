@@ -1,0 +1,571 @@
+/* Modern Meyme Voice Agent Styling */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --warm-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  --cozy-orange: #ff9a8b;
+  --cozy-purple: #a18cd1;
+  --warm-cream: #fdf4e3;
+  --soft-gray: #f8fafc;
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ffecd2 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+/* Animated background particles */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 154, 139, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(161, 140, 209, 0.2) 0%, transparent 50%);
+  animation: float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(1deg); }
+  66% { transform: translateY(10px) rotate(-1deg); }
+}
+
+/* Main container */
+.container {
+  position: relative;
+  z-index: 1;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Meyme card */
+.meyme-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem 1.5rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-strong);
+  animation: breathe 6s ease-in-out infinite;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.meyme-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-5px) scale(1.01); }
+}
+
+/* Cat avatar */
+.meyme-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.meyme-avatar:hover {
+  transform: scale(1.08) translateY(-2px);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-glow {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--cozy-orange), var(--cozy-purple), var(--cozy-orange));
+  opacity: 0;
+  animation: spin 3s linear infinite;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-glow.active {
+  opacity: 0.6;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Title and description */
+.meyme-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.02em;
+}
+
+.meyme-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Voice button */
+.voice-button-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.voice-button {
+  position: relative;
+  width: 75px;
+  height: 75px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9a8b 0%, #a18cd1 100%);
+  color: white;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(255, 154, 139, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.voice-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 154, 139, 0.6);
+}
+
+.voice-button:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.voice-button.recording {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  animation: pulseRecord 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseRecord {
+  0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); }
+  50% { transform: scale(1.08); box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6); }
+}
+
+/* Voice ripples */
+.voice-ripples {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ripple {
+  position: absolute;
+  border: 2px solid rgba(255, 154, 139, 0.4);
+  border-radius: 50%;
+  animation: ripple-expand 2s ease-out infinite;
+}
+
+.ripple:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.ripple:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes ripple-expand {
+  0% {
+    width: 80px;
+    height: 80px;
+    opacity: 1;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+/* Audio visualizer */
+.audio-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  margin: 0.5rem 0 0.25rem 0;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.audio-visualizer.active {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.visualizer-bar {
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(to top, var(--cozy-orange), var(--cozy-purple));
+  margin: 0 1.5px;
+  border-radius: 1.5px;
+  animation: visualizerPulse 0.6s ease-in-out infinite alternate;
+  transition: all 0.3s ease;
+}
+
+.visualizer-bar:nth-child(odd) {
+  animation-delay: 0.1s;
+}
+
+.visualizer-bar:nth-child(even) {
+  animation-delay: 0.2s;
+}
+
+@keyframes visualizerPulse {
+  0% { height: 16px; opacity: 0.6; }
+  100% { height: 35px; opacity: 1; }
+}
+
+/* Status message */
+.status-message {
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 0.6rem 1.2rem;
+  margin-top: 0.25rem;
+  opacity: 0;
+  transform: translateY(15px);
+  line-height: 1.4;
+}
+
+.status-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.status-message.listening {
+  background: rgba(255, 154, 139, 0.2);
+  color: white;
+}
+
+.status-message.thinking {
+  background: rgba(161, 140, 209, 0.2);
+  color: white;
+}
+
+.status-message.error {
+  background: rgba(255, 107, 107, 0.2);
+  color: white;
+}
+
+/* Hidden audio player */
+.hidden-audio {
+  display: none;
+}
+
+/* Loading dots animation */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: loading-dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '...'; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .meyme-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .meyme-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .voice-button {
+    width: 70px;
+    height: 70px;
+    font-size: 1.3rem;
+  }
+  
+  .meyme-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .meyme-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .meyme-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .voice-button {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles */
+.voice-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 154, 139, 0.4);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(255, 154, 139, 0.3);
+  color: white;
+}
+
+/* Click ripple effect */
+.click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple-click 0.6s linear;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes ripple-click {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Enhanced status message animations */
+.status-message.show {
+  animation: statusSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes statusSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Avatar interaction enhancements */
+.meyme-avatar.clicked {
+  animation: avatarBounce 0.6s ease;
+}
+
+@keyframes avatarBounce {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.05); }
+}
+
+/* Enhanced breathing animation */
+.meyme-card:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+}
+
+/* Voice button enhanced states */
+.voice-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* Processing state for voice button */
+.voice-button.processing {
+  background: linear-gradient(135deg, #a18cd1 0%, #667eea 100%);
+  animation: processingPulse 2s ease-in-out infinite;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@keyframes processingPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 6px 20px rgba(161, 140, 209, 0.4);
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 8px 25px rgba(161, 140, 209, 0.6);
+  }
+}
+
+/* Processing animation for avatar */
+.meyme-avatar.processing {
+  animation: processingFloat 3s ease-in-out infinite;
+}
+
+.meyme-avatar.processing .avatar-glow {
+  opacity: 0.8;
+  animation: spin 2s linear infinite, processingGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes processingFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+@keyframes processingGlow {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.9; }
+}
+
+/* Processing mic icon animations */
+.voice-button.processing #micIcon {
+  animation: processingMicPulse 1.8s ease-in-out infinite, processingMicFloat 2.5s ease-in-out infinite;
+}
+
+#micIcon.processing {
+  animation: processingMicBreathe 2s ease-in-out infinite, processingMicGlow 3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes processingMicPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+@keyframes processingMicFloat {
+  0%, 100% { transform: translateY(0px); }
+  33% { transform: translateY(-3px); }
+  66% { transform: translateY(2px); }
+}
+
+@keyframes processingMicBreathe {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+  }
+  25% { 
+    transform: scale(1.08) rotate(-2deg);
+    filter: brightness(1.1) drop-shadow(0 0 10px rgba(161, 140, 209, 0.8));
+  }
+  50% { 
+    transform: scale(1.12) rotate(0deg);
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 154, 139, 0.9));
+  }
+  75% { 
+    transform: scale(1.08) rotate(2deg);
+    filter: brightness(1.1) drop-shadow(0 0 10px rgba(161, 140, 209, 0.8));
+  }
+}
+
+@keyframes processingMicGlow {
+  0% { 
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+  100% { 
+    text-shadow: 0 0 20px rgba(161, 140, 209, 0.8), 0 0 30px rgba(255, 154, 139, 0.6);
+  }
+}
+
+/* Gradient text effect for special messages */
+.gradient-text {
+  background: linear-gradient(135deg, var(--cozy-orange), var(--cozy-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
