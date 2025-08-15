@@ -47,7 +47,7 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 | 11 | Implement error handling & fallbacks for STT, LLM, and TTS failures. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_ai-voiceai-errorhandling-activity-7361058707163525120-EEJH?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 12 | Revamp conversational UI with improved styling, animations, and better recording controls.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361366706272833536-PBcT?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 13 | Create README.md with project details, architecture, features, and run instructions. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361685305843765248-PiS4?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 14 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 14 | cleaned up and refactored my code for better readability, added Pydantic models, organized services, and improved logging | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7362147757945442304-NxAL?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 15 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 16 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 
