@@ -24,6 +24,7 @@ Think of her as your personal AI cat who happened to master human speech — and
 | ![AssemblyAI](https://img.shields.io/badge/AssemblyAI-FF6B35?style=flat-square&logo=ai&logoColor=white) | Speech-to-Text | Industry-leading accuracy and speed for real-time transcription |
 | ![Google Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=flat-square&logo=google&logoColor=white) | Large Language Model | Advanced conversational AI with personality customization |
 | ![Murf AI](https://img.shields.io/badge/Murf_AI-7B68EE?style=flat-square&logo=soundcloud&logoColor=white) | Text-to-Speech | High-quality, natural-sounding voice synthesis |
+| ![WebSockets](https://img.shields.io/badge/WebSockets-000000?style=flat-square&logo=websockets&logoColor=white) | Real-time Communication | For building interactive, bidirectional communication between the client and server |
 | ![Vanilla JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | Frontend Interactions | Real-time audio recording, visualization, and seamless UX |
 
 ## 🏆 30 Days of AI Voice Agents Challenge
@@ -48,7 +49,7 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 | 12 | Revamp conversational UI with improved styling, animations, and better recording controls.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361366706272833536-PBcT?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 13 | Create README.md with project details, architecture, features, and run instructions. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361685305843765248-PiS4?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 14 | cleaned up and refactored my code for better readability, added Pydantic models, organized services, and improved logging | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7362147757945442304-NxAL?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 15 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 15 | **Websockets** ← *You are here!* | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 16 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 
 
@@ -81,6 +82,7 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 ⚡ **Fast Response Times** - Optimized pipeline for near real-time interactions  
 🛡️ **Error Handling** - Graceful fallbacks when services are unavailable  
 🎵 **Audio Visualizations** - Beautiful real-time audio feedback during recording and playback  
+🔌 **WebSocket Echo** - Real-time websocket connection for streaming.
 
 ## 🚀 Getting Started
 
@@ -149,6 +151,7 @@ Open your browser and go to: http://localhost:8000
 | `GET` | `/` | Serve the main UI |
 | `POST` | `/agent/chat/{session_id}` | Process voice chat |
 | `GET` | `/health` | Check service status |
+| `WEBSOCKET` | `/ws` | Real-time websocket connection |
 
 ### Project Structure
 
