@@ -80,6 +80,22 @@ body::before {
   overflow: hidden;
 }
 
+.meyme-pfp {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 4px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  margin: 0 auto 1.5rem auto; /* Adjust margin to pull it up and center */
+  display: block;
+  transition: transform 0.3s ease-in-out;
+}
+
+.meyme-pfp:hover {
+  transform: scale(1.05);
+}
+
 .meyme-card::before {
   content: '';
   position: absolute;
@@ -115,7 +131,7 @@ body::before {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   border: 3px solid rgba(255, 255, 255, 0.3);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
@@ -145,7 +161,7 @@ body::before {
 
 /* Title and description */
 .meyme-title {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
   color: white;
   margin-bottom: 0.25rem;
@@ -350,7 +366,7 @@ body::before {
   }
   
   .meyme-card {
-    padding: 2rem 1.5rem;
+    padding: 1.75rem 1.5rem 1.5rem 1.5rem;
   }
   
   .meyme-avatar {
