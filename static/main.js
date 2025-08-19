@@ -62,13 +62,34 @@ document.addEventListener('DOMContentLoaded', () => {
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data.type === 'transcript' && data.transcript) {
-            console.log('Received transcript:', data.transcript);
-            statusMessage.textContent = `📝 "${data.transcript}"`;
+          
+          if (data.type === 'turn_end') {
+            // Handle turn detection notification
+            console.log('🔔 Turn Detection: End of turn detected!', data);
             
-            // If this is the end of a turn, you could trigger additional processing here
-            if (data.end_of_turn) {
-              console.log('End of turn detected');
+            // Display the final transcription at the end of the turn
+            if (data.transcript && data.transcript.trim()) {
+              statusMessage.textContent = `🎤 Turn complete: "${data.transcript}" (Confidence: ${(data.confidence * 100).toFixed(1)}%)`;
+              statusMessage.classList.add('turn-complete');
+              
+              // Remove the turn complete styling after 3 seconds
+              setTimeout(() => {
+                statusMessage.classList.remove('turn-complete');
+                statusMessage.textContent = '🎙️ Listening...';
+              }, 3000);
+            } else {
+              statusMessage.textContent = '🎙️ Turn ended, listening...';
+            }
+          } 
+          else if (data.type === 'transcript') {
+            // Handle regular transcript updates (for partial transcripts)
+            if (!data.end_of_turn && data.transcript) {
+              // Show partial transcripts in real-time but with different styling
+              statusMessage.textContent = `🎙️ "${data.transcript}..." (speaking)`;
+              statusMessage.classList.add('speaking');
+            } else if (data.end_of_turn && data.transcript) {
+              // This is already handled by turn_end message, but show it briefly
+              console.log('Transcript with end_of_turn:', data.transcript);
             }
           }
         } catch (e) {

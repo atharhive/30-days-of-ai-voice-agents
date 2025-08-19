@@ -49,10 +49,10 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 | 12 | Revamp conversational UI with improved styling, animations, and better recording controls.| [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361366706272833536-PBcT?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 13 | Create README.md with project details, architecture, features, and run instructions. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7361685305843765248-PiS4?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 14 | cleaned up and refactored my code for better readability, added Pydantic models, organized services, and improved logging | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7362147757945442304-NxAL?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 15 | **Websockets** ← *You are here!* | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofaivoiceagents-30daysofaivoiceagents-activity-7362414163047927808-Ts0p?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 15 | **Websockets** - Implemented WebSocket connection for real-time bidirectional communication between client and server | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofaivoiceagents-30daysofaivoiceagents-activity-7362414163047927808-Ts0p?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 16 | **Real-time Audio Streaming** - Implemented WebSocket audio streaming from browser to server with FastAPI handler | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7362861675886071808-xjY0?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 17 | **Streaming Transcription Fix** - Fixed AssemblyAI v3 streaming issues, achieved real-time word-by-word transcription ← *You are here!* | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofvoiceagents-buildwithmurf-activity-7363234086234025985-gQP8?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 18 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 17 | **Streaming Transcription Fix** - Fixed AssemblyAI v3 streaming issues, achieved real-time word-by-word transcription | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofvoiceagents-buildwithmurf-activity-7363234086234025985-gQP8?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 18 | **Turn Detection** - Implemented real-time turn detection with AssemblyAI's streaming API, smart transcript handling, and UI updates ← *You are here!* | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofai-voiceai-activity-7363483074040385537-bJG-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 19 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 20 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 21 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
@@ -89,7 +89,8 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 ⚡ **Fast Response Times** - Optimized pipeline for near real-time interactions  
 🛡️ **Error Handling** - Graceful fallbacks when services are unavailable  
 🎵 **Audio Visualizations** - Beautiful real-time audio feedback during recording and playback  
-🔌 **WebSocket Echo** - Real-time websocket connection for streaming.
+🔌 **WebSocket Streaming** - Real-time websocket connection for bi-directional communication  
+🎯 **Turn Detection** - Smart detection of when users finish speaking with confidence indicators
 
 ## 🚀 Getting Started
 
