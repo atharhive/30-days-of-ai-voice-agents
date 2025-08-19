@@ -203,10 +203,28 @@ async def websocket_endpoint(websocket: WebSocket):
             # Use call_soon_threadsafe to schedule task from thread
             main_loop.call_soon_threadsafe(
                 transcript_queue.put_nowait, 
-                {"transcript": event.transcript, "end_of_turn": event.end_of_turn}
+                {
+                    "transcript": event.transcript, 
+                    "end_of_turn": event.end_of_turn,
+                    "turn_order": event.turn_order,
+                    "turn_is_formatted": event.turn_is_formatted,
+                    "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
+                }
             )
         else:
             logger.debug(f"Turn event received but no transcript: end_of_turn={event.end_of_turn}")
+            # Still send end_of_turn notification even without transcript
+            if event.end_of_turn:
+                main_loop.call_soon_threadsafe(
+                    transcript_queue.put_nowait, 
+                    {
+                        "transcript": "", 
+                        "end_of_turn": True,
+                        "turn_order": getattr(event, 'turn_order', 0),
+                        "turn_is_formatted": getattr(event, 'turn_is_formatted', False),
+                        "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
+                    }
+                )
 
     def on_terminated(client, event: TerminationEvent):
         """Called when the session is terminated"""
@@ -216,14 +234,33 @@ async def websocket_endpoint(websocket: WebSocket):
         """Called when an error occurs"""
         logger.error(f"Streaming error: {error}")
 
-    async def send_transcript_to_client(transcript: str, end_of_turn: bool):
+    async def send_transcript_to_client(transcript_data: dict):
         """Send transcript back to client via WebSocket"""
         try:
-            await websocket_ref.send_json({
+            message = {
                 "type": "transcript",
-                "transcript": transcript,
-                "end_of_turn": end_of_turn
-            })
+                "transcript": transcript_data["transcript"],
+                "end_of_turn": transcript_data["end_of_turn"],
+                "turn_order": transcript_data.get("turn_order", 0),
+                "turn_is_formatted": transcript_data.get("turn_is_formatted", False),
+                "end_of_turn_confidence": transcript_data.get("end_of_turn_confidence", 0.0)
+            }
+            
+            # Send turn end notification if this is the end of a turn
+            if transcript_data["end_of_turn"]:
+                logger.info(f"🔔 TURN DETECTION: End of turn detected with confidence {transcript_data.get('end_of_turn_confidence', 0.0):.2f}")
+                # Send a specific turn end message
+                await websocket_ref.send_json({
+                    "type": "turn_end",
+                    "transcript": transcript_data["transcript"],
+                    "turn_order": transcript_data.get("turn_order", 0),
+                    "confidence": transcript_data.get("end_of_turn_confidence", 0.0),
+                    "is_formatted": transcript_data.get("turn_is_formatted", False)
+                })
+            
+            # Always send the transcript message
+            await websocket_ref.send_json(message)
+            
         except Exception as e:
             logger.error(f"Error sending transcript to client: {e}")
 
@@ -312,10 +349,7 @@ async def websocket_endpoint(websocket: WebSocket):
             try:
                 while True:
                     transcript_data = await transcript_queue.get()
-                    await send_transcript_to_client(
-                        transcript_data["transcript"], 
-                        transcript_data["end_of_turn"]
-                    )
+                    await send_transcript_to_client(transcript_data)
             except asyncio.CancelledError:
                 pass
         

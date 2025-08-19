@@ -585,3 +585,103 @@ body::before {
   background-clip: text;
   font-weight: 600;
 }
+
+/* Turn detection styles */
+.status-message.turn-complete {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.2));
+  color: white;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+  animation: turnCompleteGlow 0.6s ease-out;
+  transform: scale(1.02);
+}
+
+@keyframes turnCompleteGlow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(76, 175, 80, 0.4);
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+  }
+}
+
+.status-message.speaking {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+  color: white;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  animation: speakingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes speakingPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.01);
+    opacity: 1;
+  }
+}
+
+/* Turn detection confidence indicator */
+.confidence-indicator {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+}
+
+.confidence-indicator.high {
+  background: rgba(76, 175, 80, 0.2);
+  color: #C8E6C9;
+}
+
+.confidence-indicator.medium {
+  background: rgba(255, 193, 7, 0.2);
+  color: #FFF9C4;
+}
+
+.confidence-indicator.low {
+  background: rgba(255, 152, 0, 0.2);
+  color: #FFE0B2;
+}
+
+/* Turn order indicator */
+.turn-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--cozy-orange), var(--cozy-purple));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: turnIndicatorAppear 0.5s ease-out;
+}
+
+@keyframes turnIndicatorAppear {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
