@@ -91,6 +91,53 @@ if not os.path.exists(FALLBACK_AUDIO_PATH):
     logger.warning(f"Fallback audio file not found at {FALLBACK_AUDIO_PATH}")
 
 
+async def stream_llm_response(user_text: str, session_id: str) -> str:
+    """
+    Stream LLM response from Gemini and accumulate the full response.
+    Prints streaming chunks to console and returns the complete response.
+    """
+    try:
+        # Initialize history for this session
+        history = chat_histories.get(session_id, [])
+        model = genai.GenerativeModel(
+            "gemini-1.5-flash",
+            system_instruction=MEYME_SYSTEM_PROMPT
+        )
+        
+        # Start chat with existing history
+        chat = model.start_chat(history=history)
+        logger.info(f"🎯 PROCESSING USER INPUT: '{user_text}'")
+        
+        # Stream the response from Gemini
+        print(f"\n🚀 STREAMING LLM RESPONSE FOR: '{user_text}'")
+        print("=" * 60)
+        
+        accumulated_response = ""
+        
+        # Use Gemini's streaming API
+        response_stream = chat.send_message(user_text, stream=True)
+        
+        for chunk in response_stream:
+            if chunk.text:
+                # Print each chunk as it arrives
+                print(chunk.text, end="", flush=True)
+                accumulated_response += chunk.text
+        
+        print()  # New line after streaming
+        print("=" * 60)
+        print(f"✅ COMPLETE LLM RESPONSE: '{accumulated_response.strip()}'")
+        print("=" * 60)
+        
+        # Update chat history with the complete conversation
+        chat_histories[session_id] = chat.history
+        
+        return accumulated_response.strip()
+        
+    except Exception as e:
+        logger.error(f"Error in streaming LLM response: {e}")
+        return f"Sorry, I'm having trouble processing that right now. {str(e)}"
+
+
 @app.get("/")
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -118,23 +165,11 @@ async def agent_chat(
 
         user_text = transcript.text.strip()
 
-        # Step 2: Initialize Meyme with personality if it's a new session
-        history = chat_histories.get(session_id, [])
-        model = genai.GenerativeModel(
-            "gemini-1.5-flash",
-            system_instruction=MEYME_SYSTEM_PROMPT
-        )
-        
-        # Start chat with existing history
-        chat = model.start_chat(history=history)
+        # Step 2: Get streaming LLM response
         logger.info(f"User said: {user_text}")
         
-        # Get Meyme's response
-        llm_response = chat.send_message(user_text)
-        llm_text = llm_response.text.strip()
-
-        # Step 3: Save updated history
-        chat_histories[session_id] = chat.history
+        # Use our streaming LLM function
+        llm_text = await stream_llm_response(user_text, session_id)
 
         # Log Meyme's response for debugging
         logger.info(f"Meyme responded: {llm_text[:100]}...")
@@ -249,6 +284,27 @@ async def websocket_endpoint(websocket: WebSocket):
             # Send turn end notification if this is the end of a turn
             if transcript_data["end_of_turn"]:
                 logger.info(f"🔔 TURN DETECTION: End of turn detected with confidence {transcript_data.get('end_of_turn_confidence', 0.0):.2f}")
+                
+                # 🚀 NEW: Trigger streaming LLM response on final transcript
+                final_transcript = transcript_data["transcript"].strip()
+                if final_transcript and GEMINI_API_KEY:
+                    logger.info(f"🤖 TRIGGERING STREAMING LLM for final transcript: '{final_transcript}'")
+                    
+                    # Generate a session ID for this WebSocket connection
+                    session_id = f"ws_session_{id(websocket_ref)}"
+                    
+                    # Call streaming LLM function
+                    try:
+                        llm_response = await stream_llm_response(final_transcript, session_id)
+                        logger.info(f"✅ LLM streaming complete. Final response length: {len(llm_response)} chars")
+                    except Exception as llm_error:
+                        logger.error(f"❌ Error in streaming LLM: {llm_error}")
+                else:
+                    if not final_transcript:
+                        logger.info("⚠️  No final transcript to process")
+                    if not GEMINI_API_KEY:
+                        logger.warning("⚠️  GEMINI_API_KEY missing - skipping LLM processing")
+                
                 # Send a specific turn end message
                 await websocket_ref.send_json({
                     "type": "turn_end",
