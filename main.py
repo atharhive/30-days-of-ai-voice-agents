@@ -18,7 +18,6 @@ from assemblyai.streaming.v3 import (
     StreamingSessionParameters,
     TerminationEvent,
     TurnEvent,
-    PartialTranscriptEvent,
 )
 import google.generativeai as genai
 from typing import Dict, List, Any
@@ -247,53 +246,6 @@ async def stream_llm_response_with_murf_tts(user_text: str, session_id: str) -> 
         return f"Sorry, I'm having trouble processing that right now. {str(e)}"
 
 
-async def stream_llm_response(user_text: str, session_id: str) -> str:
-    """
-    Stream LLM response from Gemini and accumulate the full response.
-    Prints streaming chunks to console and returns the complete response.
-    """
-    try:
-        # Initialize history for this session
-        history = chat_histories.get(session_id, [])
-        model = genai.GenerativeModel(
-            "gemini-1.5-flash",
-            system_instruction=MEYME_SYSTEM_PROMPT
-        )
-        
-        # Start chat with existing history
-        chat = model.start_chat(history=history)
-        logger.info(f"🎯 PROCESSING USER INPUT: '{user_text}'")
-        
-        # Stream the response from Gemini
-        print(f"\n🚀 STREAMING LLM RESPONSE FOR: '{user_text}'")
-        print("=" * 60)
-        
-        accumulated_response = ""
-        
-        # Use Gemini's streaming API
-        response_stream = chat.send_message(user_text, stream=True)
-        
-        for chunk in response_stream:
-            if chunk.text:
-                # Print each chunk as it arrives
-                print(chunk.text, end="", flush=True)
-                accumulated_response += chunk.text
-        
-        print()  # New line after streaming
-        print("=" * 60)
-        print(f"✅ COMPLETE LLM RESPONSE: '{accumulated_response.strip()}'")
-        print("=" * 60)
-        
-        # Update chat history with the complete conversation
-        chat_histories[session_id] = chat.history
-        
-        return accumulated_response.strip()
-        
-    except Exception as e:
-        logger.error(f"Error in streaming LLM response: {e}")
-        return f"Sorry, I'm having trouble processing that right now. {str(e)}"
-
-
 @app.get("/")
 async def serve_ui(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -386,24 +338,6 @@ async def websocket_endpoint(websocket: WebSocket):
         """Called when the streaming session begins"""
         logger.info(f"Session started: {event.id}")
 
-    def on_partial_transcript(client, event: PartialTranscriptEvent):
-        """Called when partial transcript is received (real-time word-by-word updates)"""
-        if event.partial_transcript:
-            logger.debug(f"📝 PARTIAL: '{event.partial_transcript}'")
-            
-            # Send partial transcript immediately for real-time display
-            main_loop.call_soon_threadsafe(
-                transcript_queue.put_nowait, 
-                {
-                    "transcript": event.partial_transcript,
-                    "end_of_turn": False,
-                    "is_partial": True,
-                    "turn_order": 0,
-                    "turn_is_formatted": False,
-                    "end_of_turn_confidence": 0.0
-                }
-            )
-
     def on_turn(client, event: TurnEvent):
         """Called when a turn (transcript) is received"""
         if event.transcript:
@@ -415,7 +349,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 {
                     "transcript": event.transcript, 
                     "end_of_turn": event.end_of_turn,
-                    "is_partial": False,
+                    "is_partial": not event.end_of_turn,
                     "turn_order": event.turn_order,
                     "turn_is_formatted": event.turn_is_formatted,
                     "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
@@ -508,7 +442,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
         # Set up event handlers
         streaming_client.on(StreamingEvents.Begin, on_begin)
-        streaming_client.on(StreamingEvents.PartialTranscript, on_partial_transcript)
         streaming_client.on(StreamingEvents.Turn, on_turn)
         streaming_client.on(StreamingEvents.Termination, on_terminated)
         streaming_client.on(StreamingEvents.Error, on_error)
