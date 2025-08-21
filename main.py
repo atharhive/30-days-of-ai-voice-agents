@@ -18,11 +18,15 @@ from assemblyai.streaming.v3 import (
     StreamingSessionParameters,
     TerminationEvent,
     TurnEvent,
+    PartialTranscriptEvent,
 )
 import google.generativeai as genai
 from typing import Dict, List, Any
 import logging
 import asyncio
+import websockets
+import json
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -89,6 +93,158 @@ FALLBACK_AUDIO_PATH = "static/fallback.mp3"  # Pre-generated "I'm having trouble
 # Check if fallback audio exists on startup
 if not os.path.exists(FALLBACK_AUDIO_PATH):
     logger.warning(f"Fallback audio file not found at {FALLBACK_AUDIO_PATH}")
+
+
+async def murf_websocket_tts(text_chunks: list, context_id: str = "day20_context") -> None:
+    """
+    Send streaming text chunks to Murf WebSocket and print base64 audio responses.
+    Uses a static context_id to avoid context limit exceeded errors.
+    """
+    if not MURF_KEY:
+        logger.error("❌ MURF_API_KEY not set, cannot connect to Murf WebSocket")
+        return
+    
+    try:
+        # Murf WebSocket URL with parameters
+        ws_url = f"wss://api.murf.ai/v1/speech/stream-input?api-key={MURF_KEY}&sample_rate=44100&channel_type=MONO&format=WAV"
+        
+        print(f"\n🎵 MURF WEBSOCKET TTS STARTED")
+        print("=" * 80)
+        logger.info(f"🎵 Connecting to Murf WebSocket for TTS...")
+        
+        async with websockets.connect(ws_url) as ws:
+            # Send voice config first
+            voice_config_msg = {
+                "voice_config": {
+                    "voiceId": "en-US-amara",
+                    "style": "Conversational",
+                    "rate": 0,
+                    "pitch": 0,
+                    "variation": 1
+                },
+                "context_id": context_id  # Use static context_id to avoid limits
+            }
+            logger.info(f"📤 Sending voice configuration to Murf...")
+            await ws.send(json.dumps(voice_config_msg))
+            
+            # Send all text chunks as one message for now
+            full_text = "".join(text_chunks)
+            text_msg = {
+                "text": full_text,
+                "context_id": context_id,  # Use static context_id
+                "end": True  # Mark as end to close context
+            }
+            logger.info(f"📤 Sending text to Murf: '{full_text[:50]}{'...' if len(full_text) > 50 else ''}'")
+            await ws.send(json.dumps(text_msg))
+            
+            # Receive and process audio responses
+            audio_chunks_received = 0
+            total_base64_chars = 0
+            
+            while True:
+                try:
+                    response = await ws.recv()
+                    data = json.loads(response)
+                    
+                    if "audio" in data:
+                        audio_chunks_received += 1
+                        base64_audio = data["audio"]
+                        total_base64_chars += len(base64_audio)
+                        
+                        # Enhanced console output for screenshot
+                        print(f"\n📦 MURF BASE64 AUDIO CHUNK #{audio_chunks_received}:")
+                        print(f"   Size: {len(base64_audio):,} base64 characters")
+                        print(f"   Preview: {base64_audio[:80]}{'...' if len(base64_audio) > 80 else ''}")
+                        print("   " + "-" * 75)
+                        
+                        # Full base64 output (as requested for the task)
+                        print(f"\n🎵 FULL BASE64 AUDIO CHUNK #{audio_chunks_received}:")
+                        print(base64_audio)
+                        print("\n" + "=" * 80)
+                        
+                        logger.info(f"📥 Received audio chunk #{audio_chunks_received}: {len(base64_audio):,} chars")
+                    
+                    if data.get("final"):
+                        print(f"\n✅ MURF WEBSOCKET TTS COMPLETE!")
+                        print(f"   📊 Total chunks received: {audio_chunks_received}")
+                        print(f"   📊 Total base64 characters: {total_base64_chars:,}")
+                        print(f"   🎯 Ready for audio playback!")
+                        print("=" * 80)
+                        
+                        logger.info(f"✅ MURF TTS COMPLETE - {audio_chunks_received} chunks, {total_base64_chars:,} total chars")
+                        break
+                        
+                except websockets.exceptions.ConnectionClosed:
+                    logger.info("🔌 Murf WebSocket connection closed")
+                    break
+                except Exception as chunk_error:
+                    logger.error(f"❌ Error processing Murf response: {chunk_error}")
+                    break
+                    
+    except Exception as e:
+        logger.error(f"❌ Error in Murf WebSocket TTS: {e}")
+        print(f"❌ MURF WEBSOCKET ERROR: {e}")
+
+
+async def stream_llm_response_with_murf_tts(user_text: str, session_id: str) -> str:
+    """
+    Stream LLM response from Gemini, send chunks to Murf WebSocket for TTS,
+    and return the complete response. Prints base64 audio to console.
+    """
+    try:
+        # Initialize history for this session
+        history = chat_histories.get(session_id, [])
+        model = genai.GenerativeModel(
+            "gemini-1.5-flash",
+            system_instruction=MEYME_SYSTEM_PROMPT
+        )
+        
+        # Start chat with existing history
+        chat = model.start_chat(history=history)
+        logger.info(f"🎯 PROCESSING USER INPUT: '{user_text}'")
+        
+        # Stream the response from Gemini
+        print(f"\n🚀 STREAMING LLM RESPONSE FOR: '{user_text}'")
+        print("=" * 60)
+        
+        accumulated_response = ""
+        text_chunks = []
+        
+        # Use Gemini's streaming API
+        response_stream = chat.send_message(user_text, stream=True)
+        
+        for chunk in response_stream:
+            if chunk.text:
+                # Print each chunk as it arrives
+                print(chunk.text, end="", flush=True)
+                accumulated_response += chunk.text
+                text_chunks.append(chunk.text)
+        
+        print()  # New line after streaming
+        print("=" * 60)
+        print(f"✅ COMPLETE LLM RESPONSE: '{accumulated_response.strip()}'")
+        print("=" * 60)
+        
+        # 🎵 NEW: Send accumulated response to Murf WebSocket for TTS
+        if text_chunks and MURF_KEY:
+            logger.info(f"🎵 STARTING MURF WEBSOCKET TTS for {len(text_chunks)} chunks")
+            # Use session_id as context to maintain consistency
+            context_id = f"session_{session_id}_{hash(user_text) % 10000}"  # Create unique but predictable context
+            await murf_websocket_tts(text_chunks, context_id)
+        else:
+            if not text_chunks:
+                logger.warning("⚠️  No text chunks to send to Murf")
+            if not MURF_KEY:
+                logger.warning("⚠️  MURF_API_KEY missing - skipping Murf TTS")
+        
+        # Update chat history with the complete conversation
+        chat_histories[session_id] = chat.history
+        
+        return accumulated_response.strip()
+        
+    except Exception as e:
+        logger.error(f"Error in streaming LLM response with Murf TTS: {e}")
+        return f"Sorry, I'm having trouble processing that right now. {str(e)}"
 
 
 async def stream_llm_response(user_text: str, session_id: str) -> str:
@@ -230,6 +386,24 @@ async def websocket_endpoint(websocket: WebSocket):
         """Called when the streaming session begins"""
         logger.info(f"Session started: {event.id}")
 
+    def on_partial_transcript(client, event: PartialTranscriptEvent):
+        """Called when partial transcript is received (real-time word-by-word updates)"""
+        if event.partial_transcript:
+            logger.debug(f"📝 PARTIAL: '{event.partial_transcript}'")
+            
+            # Send partial transcript immediately for real-time display
+            main_loop.call_soon_threadsafe(
+                transcript_queue.put_nowait, 
+                {
+                    "transcript": event.partial_transcript,
+                    "end_of_turn": False,
+                    "is_partial": True,
+                    "turn_order": 0,
+                    "turn_is_formatted": False,
+                    "end_of_turn_confidence": 0.0
+                }
+            )
+
     def on_turn(client, event: TurnEvent):
         """Called when a turn (transcript) is received"""
         if event.transcript:
@@ -241,6 +415,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 {
                     "transcript": event.transcript, 
                     "end_of_turn": event.end_of_turn,
+                    "is_partial": False,
                     "turn_order": event.turn_order,
                     "turn_is_formatted": event.turn_is_formatted,
                     "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
@@ -255,6 +430,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     {
                         "transcript": "", 
                         "end_of_turn": True,
+                        "is_partial": False,
                         "turn_order": getattr(event, 'turn_order', 0),
                         "turn_is_formatted": getattr(event, 'turn_is_formatted', False),
                         "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
@@ -276,6 +452,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 "type": "transcript",
                 "transcript": transcript_data["transcript"],
                 "end_of_turn": transcript_data["end_of_turn"],
+                "is_partial": transcript_data.get("is_partial", False),
                 "turn_order": transcript_data.get("turn_order", 0),
                 "turn_is_formatted": transcript_data.get("turn_is_formatted", False),
                 "end_of_turn_confidence": transcript_data.get("end_of_turn_confidence", 0.0)
@@ -293,12 +470,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     # Generate a session ID for this WebSocket connection
                     session_id = f"ws_session_{id(websocket_ref)}"
                     
-                    # Call streaming LLM function
+                    # 🎵 NEW DAY 20: Call streaming LLM function with Murf WebSocket TTS
                     try:
-                        llm_response = await stream_llm_response(final_transcript, session_id)
-                        logger.info(f"✅ LLM streaming complete. Final response length: {len(llm_response)} chars")
+                        llm_response = await stream_llm_response_with_murf_tts(final_transcript, session_id)
+                        logger.info(f"✅ LLM streaming + Murf TTS complete. Final response length: {len(llm_response)} chars")
                     except Exception as llm_error:
-                        logger.error(f"❌ Error in streaming LLM: {llm_error}")
+                        logger.error(f"❌ Error in streaming LLM with Murf TTS: {llm_error}")
                 else:
                     if not final_transcript:
                         logger.info("⚠️  No final transcript to process")
@@ -331,6 +508,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
         # Set up event handlers
         streaming_client.on(StreamingEvents.Begin, on_begin)
+        streaming_client.on(StreamingEvents.PartialTranscript, on_partial_transcript)
         streaming_client.on(StreamingEvents.Turn, on_turn)
         streaming_client.on(StreamingEvents.Termination, on_terminated)
         streaming_client.on(StreamingEvents.Error, on_error)

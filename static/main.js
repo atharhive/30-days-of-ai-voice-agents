@@ -57,39 +57,61 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = true;
         updateUIForRecording();
         statusMessage.textContent = '🎙️ Listening...';
+        statusMessage.classList.add('show');
       };
 
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
           
-          if (data.type === 'turn_end') {
-            // Handle turn detection notification
-            console.log('🔔 Turn Detection: End of turn detected!', data);
-            
-            // Display the final transcription at the end of the turn
-            if (data.transcript && data.transcript.trim()) {
-              statusMessage.textContent = `🎤 Turn complete: "${data.transcript}" (Confidence: ${(data.confidence * 100).toFixed(1)}%)`;
+          // Handle different types of transcript messages
+          if (data.type === 'transcript' && data.transcript) {
+            if (data.is_partial) {
+              // Real-time partial transcript - update immediately with lighter styling
+              statusMessage.textContent = data.transcript;
+              statusMessage.classList.remove('turn-complete', 'processing');
+              statusMessage.classList.add('speaking', 'partial');
+            } else if (data.end_of_turn) {
+              // Final transcript for this turn - more solid styling
+              statusMessage.textContent = data.transcript;
+              statusMessage.classList.remove('speaking', 'partial');
               statusMessage.classList.add('turn-complete');
               
-              // Remove the turn complete styling after 3 seconds
+              // Show processing AI response indicator
               setTimeout(() => {
+                statusMessage.textContent = '🤖 Meyme is responding...';
                 statusMessage.classList.remove('turn-complete');
-                statusMessage.textContent = '🎙️ Listening...';
-              }, 3000);
+                statusMessage.classList.add('processing');
+              }, 1000);
             } else {
-              statusMessage.textContent = '🎙️ Turn ended, listening...';
+              // Regular transcript update
+              statusMessage.textContent = data.transcript;
+              statusMessage.classList.remove('turn-complete', 'processing', 'partial');
+              statusMessage.classList.add('speaking');
             }
           } 
-          else if (data.type === 'transcript') {
-            // Handle regular transcript updates (for partial transcripts)
-            if (!data.end_of_turn && data.transcript) {
-              // Show partial transcripts in real-time but with different styling
-              statusMessage.textContent = `🎙️ "${data.transcript}..." (speaking)`;
-              statusMessage.classList.add('speaking');
-            } else if (data.end_of_turn && data.transcript) {
-              // This is already handled by turn_end message, but show it briefly
-              console.log('Transcript with end_of_turn:', data.transcript);
+          else if (data.type === 'turn_end') {
+            // Handle explicit turn end messages
+            if (data.transcript && data.transcript.trim()) {
+              statusMessage.textContent = data.transcript;
+              statusMessage.classList.remove('speaking', 'partial');
+              statusMessage.classList.add('turn-complete');
+              
+              // Show processing AI response indicator
+              setTimeout(() => {
+                statusMessage.textContent = '🤖 Meyme is responding...';
+                statusMessage.classList.remove('turn-complete');
+                statusMessage.classList.add('processing');
+              }, 1500);
+              
+              // Clear after processing and get ready for next input
+              setTimeout(() => {
+                statusMessage.textContent = '🎤 Ready to listen...';
+                statusMessage.classList.remove('processing');
+              }, 8000); // Longer delay to account for AI processing time
+            } else {
+              statusMessage.textContent = '🎤 Listening...';
+              statusMessage.classList.remove('speaking', 'processing', 'turn-complete', 'partial');
             }
           }
         } catch (e) {

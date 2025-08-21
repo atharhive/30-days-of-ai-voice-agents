@@ -337,6 +337,91 @@ body::before {
   color: white;
 }
 
+.status-message.speaking {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-height: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+.status-message.turn-complete {
+  background: rgba(76, 175, 80, 0.15);
+  color: #E8F5E8;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-message.processing {
+  background: rgba(255, 152, 0, 0.15);
+  color: #FFF3E0;
+  animation: processingPulse 1.2s ease-in-out infinite;
+}
+
+.status-message.partial {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: italic;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: partialPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes partialPulse {
+  0%, 100% { 
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.005);
+  }
+}
+
+@keyframes speakingPulse {
+  0%, 100% { 
+    opacity: 0.9;
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2); 
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4); 
+  }
+}
+
+@keyframes completePulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(69, 183, 209, 0.5); 
+  }
+}
+
+@keyframes processingPulse {
+  0%, 100% { 
+    opacity: 0.8;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2); 
+  }
+  33% { 
+    opacity: 1;
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4); 
+  }
+  66% { 
+    opacity: 0.9;
+    box-shadow: 0 5px 18px rgba(243, 156, 18, 0.3); 
+  }
+}
+
 /* Hidden audio player */
 .hidden-audio {
   display: none;
@@ -616,6 +701,19 @@ body::before {
   color: white;
   border: 1px solid rgba(255, 193, 7, 0.3);
   animation: speakingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    transform: scale(1.005);
+    opacity: 1;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+  }
 }
 
 @keyframes speakingPulse {
