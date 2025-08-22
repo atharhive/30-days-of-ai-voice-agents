@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let mediaStreamSource = null;
   let processor = null;
   let socket = null;
+  let accumulatedAudioChunks = []; // 🎵 DAY 21: Array to accumulate base64 audio chunks
 
   const SAMPLE_RATE = 16000; // AssemblyAI required sample rate
   const BUFFER_SIZE = 4096; // Audio processing buffer size
@@ -58,21 +59,82 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUIForRecording();
         statusMessage.textContent = '🎙️ Listening...';
         statusMessage.classList.add('show');
+        
+        // 🎵 DAY 21: Clear accumulated audio chunks for new session
+        accumulatedAudioChunks = [];
+        console.log('🔌 ✅ WebSocket connection established');
+        console.log('🎵 ✅ Ready for audio streaming');
+        console.log('🧹 ✅ Cleared accumulated audio chunks for new recording session');
+        console.log('🎤 ✅ Microphone active and listening...');
       };
 
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
           
+          // 🎵 DAY 21: Handle audio chunk messages
+          if (data.type === 'audio_chunk') {
+            console.log(`🎵 AUDIO CHUNK RECEIVED #${data.chunk_index}`);
+            console.log('🎵' + '='.repeat(50));
+            console.log(`📦 Chunk Size: ${data.chunk_size} base64 characters`);
+            console.log(`📊 Total Chunks Received: ${data.total_chunks_received}`);
+            console.log(`🔍 Base64 Preview: ${data.base64_audio.substring(0, 80)}${data.base64_audio.length > 80 ? '...' : ''}`);
+            console.log(`📄 Full Base64 Audio:`, data.base64_audio);
+            console.log('🎵' + '='.repeat(50));
+            
+            // Accumulate the audio chunk
+            accumulatedAudioChunks.push(data.base64_audio);
+            console.log(`📦 ✅ ACCUMULATED AUDIO CHUNKS: ${accumulatedAudioChunks.length} chunks stored`);
+            console.log(`📦 ✅ Chunk #${data.chunk_index} successfully added to array`);
+            
+            // Update status message to show audio streaming
+            statusMessage.textContent = `🎵 Receiving audio chunk ${data.chunk_index}...`;
+            statusMessage.classList.remove('turn-complete', 'processing', 'speaking', 'partial');
+            statusMessage.classList.add('speaking');
+            
+            return; // Don't process further
+          }
+          
+          // 🎵 DAY 21: Handle audio completion message
+          if (data.type === 'audio_complete') {
+            console.log(`🎉 AUDIO STREAMING COMPLETE!`);
+            console.log('🎉' + '='.repeat(50));
+            console.log(`✅ Total Audio Chunks: ${data.total_chunks}`);
+            console.log(`✅ Total Base64 Characters: ${data.total_base64_chars}`);
+            console.log(`✅ Accumulated Chunks: ${data.accumulated_chunks}`);
+            console.log(`✅ Audio Format: WAV (44.1kHz, Mono)`);
+            console.log(`✅ Voice: en-US-amara (Conversational)`);
+            console.log(`📦 All Accumulated Chunks:`, accumulatedAudioChunks);
+            console.log('🎉' + '='.repeat(50));
+            console.log(`🎵 ✅ AUDIO STREAMING PIPELINE SUCCESSFUL!`);
+            
+            // Update status message
+            statusMessage.textContent = '🎵 Audio streaming complete!';
+            statusMessage.classList.remove('speaking', 'processing', 'turn-complete', 'partial');
+            
+            // Clear accumulated chunks for next conversation
+            setTimeout(() => {
+              accumulatedAudioChunks = [];
+              statusMessage.textContent = '🎤 Ready to listen...';
+              console.log('🧹 ✅ Cleared accumulated audio chunks for next conversation');
+              console.log('🧹 ✅ Ready for new audio streaming session');
+            }, 3000);
+            
+            return; // Don't process further
+          }
+          
           // Handle different types of transcript messages
           if (data.type === 'transcript' && data.transcript) {
             if (data.is_partial) {
               // Real-time partial transcript - update immediately with lighter styling
+              console.log(`📝 PARTIAL TRANSCRIPT: "${data.transcript}"`);
               statusMessage.textContent = data.transcript;
               statusMessage.classList.remove('turn-complete', 'processing');
               statusMessage.classList.add('speaking', 'partial');
             } else if (data.end_of_turn) {
               // Final transcript for this turn - more solid styling
+              console.log(`✅ FINAL TRANSCRIPT: "${data.transcript}"`);
+              console.log(`🎯 Turn completed - triggering AI response`);
               statusMessage.textContent = data.transcript;
               statusMessage.classList.remove('speaking', 'partial');
               statusMessage.classList.add('turn-complete');
@@ -85,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }, 1000);
             } else {
               // Regular transcript update
+              console.log(`📝 TRANSCRIPT UPDATE: "${data.transcript}"`);
               statusMessage.textContent = data.transcript;
               statusMessage.classList.remove('turn-complete', 'processing', 'partial');
               statusMessage.classList.add('speaking');
@@ -120,12 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       socket.onclose = () => {
-        console.log('WebSocket connection closed');
+        console.log('🔌 WebSocket connection closed');
+        console.log('🛑 Audio streaming session ended');
         stopRecording();
       };
 
       socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('❌ WebSocket error:', error);
+        console.error('🛑 Audio streaming interrupted');
         stopRecording();
       };
 
