@@ -53,9 +53,10 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 | 16 | **Real-time Audio Streaming** - Implemented WebSocket audio streaming from browser to server with FastAPI handler | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7362861675886071808-xjY0?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 17 | **Streaming Transcription Fix** - Fixed AssemblyAI v3 streaming issues, achieved real-time word-by-word transcription | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofvoiceagents-buildwithmurf-activity-7363234086234025985-gQP8?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 18 | **Turn Detection** - Implemented real-time turn detection with AssemblyAI's streaming API, smart transcript handling, and UI updates | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-30daysofai-voiceai-activity-7363483074040385537-bJG-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 19 | **Streaming LLM Responses** - Integrated streaming LLM responses with real-time console output. When final transcript received from AssemblyAI → sends to Gemini streaming API → prints response chunks live to console ← *You are here!* | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7363948006980677632-kKs5?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 20 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 21 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 19 | **Streaming LLM Responses** - Integrated streaming LLM responses with real-time console output. When final transcript received from AssemblyAI → sends to Gemini streaming API → prints response chunks live to console | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7363948006980677632-kKs5?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 20 | **Murf WebSocket TTS Integration** - Integrated Murf WebSocket API for real-time text-to-speech with base64 audio streaming and console output | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 21 | **Streaming Audio Data to Client** - Stream base64 audio chunks from Murf TTS to client via WebSocket, accumulate chunks in array, and print client acknowledgments | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_day-21-of-my-30-days-of-ai-voice-agents-activity-7364722864282853376-WViK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 22 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 22 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 23 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 
@@ -91,7 +92,8 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 🎵 **Audio Visualizations** - Beautiful real-time audio feedback during recording and playback  
 🔌 **WebSocket Streaming** - Real-time websocket connection for bi-directional communication  
 🎯 **Turn Detection** - Smart detection of when users finish speaking with confidence indicators  
-🚀 **Streaming LLM Responses** - Real-time LLM response streaming with live console output as AI "thinks"
+🚀 **Streaming LLM Responses** - Real-time LLM response streaming with live console output as AI "thinks"  
+🎵 **Streaming Audio to Client** - Real-time base64 audio streaming from Murf TTS to client with chunk accumulation
 
 ## 🚀 Getting Started
 
