@@ -8,17 +8,6 @@ from dotenv import load_dotenv
 import requests
 import os
 import assemblyai as aai
-from assemblyai.streaming.v3 import (
-    BeginEvent,
-    StreamingClient,
-    StreamingClientOptions,
-    StreamingError,
-    StreamingEvents,
-    StreamingParameters,
-    StreamingSessionParameters,
-    TerminationEvent,
-    TurnEvent,
-)
 import google.generativeai as genai
 from typing import Dict, List, Any
 import logging
@@ -30,6 +19,20 @@ import base64
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Use the current AssemblyAI streaming API structure
+try:
+    from assemblyai.streaming import (
+        StreamingClient,
+        StreamingClientOptions,
+        StreamingParameters,
+    )
+    # For compatibility with newer versions
+    ASSEMBLYAI_STREAMING_AVAILABLE = True
+except ImportError:
+    # Fallback for older versions or if streaming not available
+    ASSEMBLYAI_STREAMING_AVAILABLE = False
+    logger.warning("AssemblyAI streaming not available - WebSocket features will be limited")
 
 # Load API keys
 load_dotenv()
@@ -186,24 +189,39 @@ async def murf_websocket_tts(text_chunks: list, context_id: str = "day20_context
                         logger.info(f"📥 Received audio chunk #{audio_chunks_received}: {len(base64_audio):,} chars")
                         
                         # 🎵 DAY 21: Stream audio data to client via WebSocket
-                        if client_websocket and client_websocket.client_state.value == 1:  # WebSocketState.CONNECTED
+                        if client_websocket and hasattr(client_websocket, 'client_state'):
                             try:
-                                audio_message = {
-                                    "type": "audio_chunk",
-                                    "chunk_index": audio_chunks_received,
-                                    "base64_audio": base64_audio,
-                                    "chunk_size": len(base64_audio),
-                                    "total_chunks_received": audio_chunks_received
-                                }
-                                await client_websocket.send_json(audio_message)
-                                print(f"📤 ✅ STREAMED AUDIO CHUNK #{audio_chunks_received} TO CLIENT")
-                                print(f"📤 ✅ Client acknowledged receipt of {len(base64_audio):,} base64 characters")
-                                logger.info(f"📤 Streamed audio chunk #{audio_chunks_received} to client")
+                                # Check if WebSocket is still in CONNECTED state
+                                if client_websocket.client_state.name == "CONNECTED":
+                                    audio_message = {
+                                        "type": "audio_chunk",
+                                        "chunk_index": audio_chunks_received,
+                                        "base64_audio": base64_audio,
+                                        "chunk_size": len(base64_audio),
+                                        "total_chunks_received": audio_chunks_received
+                                    }
+                                    await client_websocket.send_json(audio_message)
+                                    print(f"📤 ✅ STREAMED AUDIO CHUNK #{audio_chunks_received} TO CLIENT")
+                                    print(f"📤 ✅ Client acknowledged receipt of {len(base64_audio):,} base64 characters")
+                                    logger.info(f"📤 Streamed audio chunk #{audio_chunks_received} to client")
+                                else:
+                                    print(f"⚠️  Client WebSocket state: {client_websocket.client_state.name} - stopping audio streaming")
+                                    logger.warning(f"Client WebSocket no longer connected ({client_websocket.client_state.name}) - stopping TTS streaming")
+                                    # Break out of the TTS loop since client disconnected
+                                    break
                             except Exception as stream_error:
-                                print(f"❌ STREAMING ERROR: {stream_error}")
-                                logger.error(f"❌ Error streaming audio chunk to client: {stream_error}")
+                                if "close message has been sent" in str(stream_error) or "Connection is closed" in str(stream_error):
+                                    print(f"⚠️  Client WebSocket closed - stopping audio streaming")
+                                    logger.info(f"Client WebSocket closed during streaming - stopping TTS")
+                                    # Break out of the loop gracefully
+                                    break
+                                else:
+                                    print(f"❌ STREAMING ERROR: {stream_error}")
+                                    logger.error(f"❌ Error streaming audio chunk to client: {stream_error}")
                         else:
-                            print(f"⚠️  Client WebSocket not connected - skipping audio streaming")
+                            print(f"⚠️  Client WebSocket not available - skipping audio streaming")
+                            # If no client websocket, no point in continuing TTS
+                            break
                     
                     if data.get("final"):
                         # 🎉 ENHANCED: Beautiful completion console output
@@ -381,7 +399,7 @@ async def agent_chat(
         logger.info(f"User said: {user_text}")
         
         # Use our streaming LLM function
-        llm_text = await stream_llm_response(user_text, session_id)
+        llm_text = await stream_llm_response_with_murf_tts(user_text, session_id)
 
         # Log Meyme's response for debugging
         logger.info(f"Meyme responded: {llm_text[:100]}...")
@@ -423,258 +441,267 @@ async def agent_chat(
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     logger.info("WebSocket connection established.")
+    
+    connected = True
 
     if not ASSEMBLY_KEY:
         logger.error("ASSEMBLYAI_API_KEY is not set. Cannot start streaming transcription.")
         await websocket.close(code=1011)  # Internal Error
         return
-
-    streaming_client = None
-    websocket_ref = websocket  # Keep reference for event handlers
-    
-    # Get the current event loop to schedule tasks from threads
-    main_loop = asyncio.get_running_loop()
-    
-    # Queue to pass transcripts from thread to main loop
-    transcript_queue = asyncio.Queue()
-
-    def on_begin(client, event: BeginEvent):
-        """Called when the streaming session begins"""
-        logger.info(f"Session started: {event.id}")
-
-    def on_turn(client, event: TurnEvent):
-        """Called when a turn (transcript) is received"""
-        if event.transcript:
-            logger.info(f"🎯 TRANSCRIPT RECEIVED: '{event.transcript}' (end_of_turn: {event.end_of_turn})")
-            
-            # Use call_soon_threadsafe to schedule task from thread
-            main_loop.call_soon_threadsafe(
-                transcript_queue.put_nowait, 
-                {
-                    "transcript": event.transcript, 
-                    "end_of_turn": event.end_of_turn,
-                    "is_partial": not event.end_of_turn,
-                    "turn_order": event.turn_order,
-                    "turn_is_formatted": event.turn_is_formatted,
-                    "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
-                }
-            )
-        else:
-            logger.debug(f"Turn event received but no transcript: end_of_turn={event.end_of_turn}")
-            # Still send end_of_turn notification even without transcript
-            if event.end_of_turn:
-                main_loop.call_soon_threadsafe(
-                    transcript_queue.put_nowait, 
-                    {
-                        "transcript": "", 
-                        "end_of_turn": True,
-                        "is_partial": False,
-                        "turn_order": getattr(event, 'turn_order', 0),
-                        "turn_is_formatted": getattr(event, 'turn_is_formatted', False),
-                        "end_of_turn_confidence": getattr(event, 'end_of_turn_confidence', 0.0)
-                    }
-                )
-
-    def on_terminated(client, event: TerminationEvent):
-        """Called when the session is terminated"""
-        logger.info(f"Session terminated: {event.audio_duration_seconds} seconds of audio processed")
-
-    def on_error(client, error: StreamingError):
-        """Called when an error occurs"""
-        logger.error(f"Streaming error: {error}")
-
-    async def send_transcript_to_client(transcript_data: dict):
-        """Send transcript back to client via WebSocket"""
+        
+    if not ASSEMBLYAI_STREAMING_AVAILABLE:
+        logger.warning("AssemblyAI streaming not available with current version. Using basic transcription mode.")
+        # Send a message to client about limited functionality
         try:
-            message = {
-                "type": "transcript",
-                "transcript": transcript_data["transcript"],
-                "end_of_turn": transcript_data["end_of_turn"],
-                "is_partial": transcript_data.get("is_partial", False),
-                "turn_order": transcript_data.get("turn_order", 0),
-                "turn_is_formatted": transcript_data.get("turn_is_formatted", False),
-                "end_of_turn_confidence": transcript_data.get("end_of_turn_confidence", 0.0)
-            }
-            
-            # Send turn end notification if this is the end of a turn
-            if transcript_data["end_of_turn"]:
-                logger.info(f"🔔 TURN DETECTION: End of turn detected with confidence {transcript_data.get('end_of_turn_confidence', 0.0):.2f}")
-                
-                # 🚀 NEW: Trigger streaming LLM response on final transcript
-                final_transcript = transcript_data["transcript"].strip()
-                if final_transcript and GEMINI_API_KEY:
-                    logger.info(f"🤖 TRIGGERING STREAMING LLM for final transcript: '{final_transcript}'")
-                    
-                    # Generate a session ID for this WebSocket connection
-                    session_id = f"ws_session_{id(websocket_ref)}"
-                    
-                    # 🎵 NEW DAY 20: Call streaming LLM function with Murf WebSocket TTS
-                    try:
-                        # 🎵 DAY 21: Pass WebSocket reference for audio streaming
-                        llm_response = await stream_llm_response_with_murf_tts(final_transcript, session_id, websocket_ref)
-                        logger.info(f"✅ LLM streaming + Murf TTS complete. Final response length: {len(llm_response)} chars")
-                    except Exception as llm_error:
-                        logger.error(f"❌ Error in streaming LLM with Murf TTS: {llm_error}")
-                else:
-                    if not final_transcript:
-                        logger.info("⚠️  No final transcript to process")
-                    if not GEMINI_API_KEY:
-                        logger.warning("⚠️  GEMINI_API_KEY missing - skipping LLM processing")
-                
-                # Send a specific turn end message
-                await websocket_ref.send_json({
-                    "type": "turn_end",
-                    "transcript": transcript_data["transcript"],
-                    "turn_order": transcript_data.get("turn_order", 0),
-                    "confidence": transcript_data.get("end_of_turn_confidence", 0.0),
-                    "is_formatted": transcript_data.get("turn_is_formatted", False)
-                })
-            
-            # Always send the transcript message
-            await websocket_ref.send_json(message)
-            
+            await websocket.send_json({
+                "type": "info",
+                "message": "Using basic transcription mode. Real-time streaming not available with current AssemblyAI version."
+            })
         except Exception as e:
-            logger.error(f"Error sending transcript to client: {e}")
-
+            logger.error(f"Error sending info message: {e}")
+            return
+    
+    # Keep track of accumulated audio for basic transcription
+    audio_chunks = []
+    audio_chunk_count = 0
+    last_transcription_time = asyncio.get_event_loop().time()
+    
     try:
-        # Initialize AssemblyAI v3 StreamingClient
-        streaming_client = StreamingClient(
-            StreamingClientOptions(
-                api_key=ASSEMBLY_KEY,
-                api_host="streaming.assemblyai.com",
-            )
-        )
-
-        # Set up event handlers
-        streaming_client.on(StreamingEvents.Begin, on_begin)
-        streaming_client.on(StreamingEvents.Turn, on_turn)
-        streaming_client.on(StreamingEvents.Termination, on_terminated)
-        streaming_client.on(StreamingEvents.Error, on_error)
-
-        # Connect to AssemblyAI streaming service
-        streaming_client.connect(
-            StreamingParameters(
-                sample_rate=16000,  # 16kHz as required
-                format_turns=True,  # Enable turn formatting
-            )
-        )
-        logger.info("AssemblyAI v3 StreamingClient connected.")
-
-        # Create a simple audio forwarder
-        import queue
-        import threading
-        
-        # Queue to pass audio data between async WebSocket and AssemblyAI
-        audio_queue = queue.Queue(maxsize=100)
-        keep_running = asyncio.Event()
-        keep_running.set()  # Initially set to True
-        
-        # Create synchronous iterator for audio streaming (AssemblyAI v3 expects sync iterator)
-        class AudioStreamIterator:
-            def __init__(self, audio_queue, keep_running_event):
-                self.audio_queue = audio_queue
-                self.keep_running = keep_running_event
-                self.chunk_size = int(16000 * 0.1 * 2)  # 100ms chunks, 3200 bytes
-            
-            def __iter__(self):
-                return self
-            
-            def __next__(self):
-                if not self.keep_running.is_set():
-                    raise StopIteration
+        while connected:
+            try:
+                # Check if connection is still open before receiving
+                if websocket.client_state.name != "CONNECTED":
+                    logger.info("WebSocket no longer connected, breaking loop")
+                    break
                     
+                # Try to receive as binary data first (audio)
                 try:
-                    # Get audio data from queue with timeout
-                    audio_data = self.audio_queue.get(timeout=0.1)
+                    audio_data = await websocket.receive_bytes()
+                    audio_chunk_count += 1
+                    audio_chunks.append(audio_data)
                     
-                    # Ensure minimum size for AssemblyAI (at least 50ms)
-                    if len(audio_data) < self.chunk_size:
-                        audio_data = audio_data + b'\x00' * (self.chunk_size - len(audio_data))
+                    logger.info(f"📥 Received audio chunk #{audio_chunk_count}: {len(audio_data)} bytes")
                     
-                    return audio_data
+                    # Send acknowledgment back to client (only if still connected)
+                    if websocket.client_state.name == "CONNECTED":
+                        try:
+                            await websocket.send_json({
+                                "type": "audio_received",
+                                "chunk_count": audio_chunk_count,
+                                "bytes": len(audio_data)
+                            })
+                        except Exception as send_error:
+                            logger.error(f"Error sending audio acknowledgment: {send_error}")
+                            break
                     
-                except queue.Empty:
-                    # Return silence if no audio available - this keeps the stream alive
-                    return b'\x00' * self.chunk_size
-                except Exception as e:
-                    logger.error(f"Error in audio iterator: {e}")
-                    raise StopIteration
-        
-        # Create the audio iterator
-        audio_iterator = AudioStreamIterator(audio_queue, keep_running)
-        
-        # Start AssemblyAI streaming in a background task using executor
-        def run_streaming_client():
-            try:
-                # Use the synchronous iterator - this runs in a separate thread
-                streaming_client.stream(audio_iterator)  # Note: removed await since this might be sync
+                    # Basic transcription every 3 seconds or when we have enough audio
+                    current_time = asyncio.get_event_loop().time()
+                    if (current_time - last_transcription_time > 3.0 and len(audio_chunks) > 10) or len(audio_chunks) > 100:
+                        logger.info(f"🎯 Processing {len(audio_chunks)} audio chunks for transcription...")
+                        
+                        # Convert audio chunks to WAV format for AssemblyAI
+                        try:
+                            # Combine all audio chunks into a single buffer
+                            combined_audio = b''.join(audio_chunks)
+                            
+                            # Create a WAV file in memory
+                            import wave
+                            import io
+                            
+                            # Convert PCM to WAV format
+                            wav_buffer = io.BytesIO()
+                            with wave.open(wav_buffer, 'wb') as wav_file:
+                                wav_file.setnchannels(1)  # Mono
+                                wav_file.setsampwidth(2)  # 16-bit
+                                wav_file.setframerate(16000)  # 16kHz
+                                wav_file.writeframes(combined_audio)
+                            
+                            wav_buffer.seek(0)
+                            
+                            # Send to AssemblyAI for transcription
+                            if ASSEMBLY_KEY:
+                                transcriber = aai.Transcriber()
+                                transcript = transcriber.transcribe(wav_buffer)
+                                
+                                if transcript.status == aai.TranscriptStatus.completed and transcript.text:
+                                    user_text = transcript.text.strip()
+                                    logger.info(f"✅ Transcribed: {user_text}")
+                                    
+                                    # Send transcript to client
+                                    if websocket.client_state.name == "CONNECTED":
+                                        try:
+                                            await websocket.send_json({
+                                                "type": "transcript",
+                                                "transcript": user_text,
+                                                "is_partial": False,
+                                                "end_of_turn": True
+                                            })
+                                        except Exception as transcript_error:
+                                            logger.error(f"Error sending transcript: {transcript_error}")
+                                            break
+                                    
+                                    # Generate LLM response and stream TTS audio
+                                    session_id = f"ws_session_{audio_chunk_count}"
+                                    try:
+                                        llm_response = await stream_llm_response_with_murf_tts(
+                                            user_text, session_id, websocket
+                                        )
+                                        logger.info(f"✅ Generated response: {llm_response[:100]}...")
+                                    except Exception as llm_error:
+                                        logger.error(f"Error generating LLM response: {llm_error}")
+                                        # Send error message to client
+                                        if websocket.client_state.name == "CONNECTED":
+                                            try:
+                                                await websocket.send_json({
+                                                    "type": "transcript",
+                                                    "transcript": "I'm having trouble understanding that. Could you try again?",
+                                                    "is_partial": False,
+                                                    "end_of_turn": True
+                                                })
+                                            except:
+                                                pass
+                                else:
+                                    logger.warning(f"Transcription failed: {transcript.error if transcript.status == aai.TranscriptStatus.error else 'No speech detected'}")
+                                    # Send message about no speech detected
+                                    if websocket.client_state.name == "CONNECTED":
+                                        try:
+                                            await websocket.send_json({
+                                                "type": "transcript",
+                                                "transcript": "I didn't catch that. Could you speak a bit louder?",
+                                                "is_partial": False,
+                                                "end_of_turn": False
+                                            })
+                                        except:
+                                            pass
+                            else:
+                                logger.error("AssemblyAI API key not available")
+                                
+                        except Exception as processing_error:
+                            logger.error(f"Error processing audio chunks: {processing_error}")
+                            
+                        # Clear audio chunks and reset timer
+                        audio_chunks = []
+                        last_transcription_time = current_time
+                        
+                except Exception as binary_error:
+                    # If bytes fails, try JSON (but check connection first)
+                    if websocket.client_state.name != "CONNECTED":
+                        logger.info("WebSocket disconnected during binary receive attempt")
+                        break
+                        
+                    try:
+                        data = await websocket.receive_json()
+                        
+                        if data.get("type") == "ping":
+                            if websocket.client_state.name == "CONNECTED":
+                                await websocket.send_json({"type": "pong"})
+                        elif data.get("type") == "end_turn":
+                            # Handle manual turn completion
+                            if audio_chunks:
+                                logger.info(f"🎯 End turn signal - processing accumulated audio...")
+                                
+                                # Process accumulated audio chunks for transcription
+                                try:
+                                    # Combine all audio chunks into a single buffer
+                                    combined_audio = b''.join(audio_chunks)
+                                    
+                                    # Create a WAV file in memory
+                                    import wave
+                                    import io
+                                    
+                                    # Convert PCM to WAV format
+                                    wav_buffer = io.BytesIO()
+                                    with wave.open(wav_buffer, 'wb') as wav_file:
+                                        wav_file.setnchannels(1)  # Mono
+                                        wav_file.setsampwidth(2)  # 16-bit
+                                        wav_file.setframerate(16000)  # 16kHz
+                                        wav_file.writeframes(combined_audio)
+                                    
+                                    wav_buffer.seek(0)
+                                    
+                                    # Send to AssemblyAI for transcription
+                                    if ASSEMBLY_KEY:
+                                        transcriber = aai.Transcriber()
+                                        transcript = transcriber.transcribe(wav_buffer)
+                                        
+                                        if transcript.status == aai.TranscriptStatus.completed and transcript.text:
+                                            user_text = transcript.text.strip()
+                                            logger.info(f"✅ End turn transcribed: {user_text}")
+                                            
+                                            # Send transcript to client
+                                            if websocket.client_state.name == "CONNECTED":
+                                                try:
+                                                    await websocket.send_json({
+                                                        "type": "transcript",
+                                                        "transcript": user_text,
+                                                        "is_partial": False,
+                                                        "end_of_turn": True
+                                                    })
+                                                except Exception as transcript_error:
+                                                    logger.error(f"Error sending end turn transcript: {transcript_error}")
+                                                    break
+                                            
+                                            # Generate LLM response and stream TTS audio
+                                            session_id = f"ws_session_{audio_chunk_count}"
+                                            try:
+                                                llm_response = await stream_llm_response_with_murf_tts(
+                                                    user_text, session_id, websocket
+                                                )
+                                                logger.info(f"✅ End turn generated response: {llm_response[:100]}...")
+                                            except Exception as llm_error:
+                                                logger.error(f"Error generating LLM response on end turn: {llm_error}")
+                                                # Send error message to client
+                                                if websocket.client_state.name == "CONNECTED":
+                                                    try:
+                                                        await websocket.send_json({
+                                                            "type": "transcript",
+                                                            "transcript": "I'm having trouble understanding that. Could you try again?",
+                                                            "is_partial": False,
+                                                            "end_of_turn": True
+                                                        })
+                                                    except:
+                                                        pass
+                                        else:
+                                            logger.warning(f"End turn transcription failed: {transcript.error if transcript.status == aai.TranscriptStatus.error else 'No speech detected'}")
+                                            # Send message about no speech detected
+                                            if websocket.client_state.name == "CONNECTED":
+                                                try:
+                                                    await websocket.send_json({
+                                                        "type": "transcript",
+                                                        "transcript": "I didn't catch that. Could you speak a bit louder?",
+                                                        "is_partial": False,
+                                                        "end_of_turn": False
+                                                    })
+                                                except:
+                                                    pass
+                                    else:
+                                        logger.error("AssemblyAI API key not available for end turn processing")
+                                        
+                                except Exception as processing_error:
+                                    logger.error(f"Error processing end turn audio chunks: {processing_error}")
+                                
+                                # Clear audio chunks after processing
+                                audio_chunks = []
+                                
+                    except Exception as json_error:
+                        logger.error(f"Error receiving JSON message: {json_error}")
+                        break
+                            
+            except WebSocketDisconnect:
+                logger.info("Client disconnected (WebSocketDisconnect caught)")
+                connected = False
+                break
             except Exception as e:
-                logger.error(f"Error in streaming_client.stream: {e}")
-        
-        # Start the AssemblyAI streaming task in a thread executor
-        import concurrent.futures
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-        streaming_task = asyncio.get_event_loop().run_in_executor(executor, run_streaming_client)
-        
-        # Task to process transcript queue and send to WebSocket
-        async def process_transcripts():
-            try:
-                while True:
-                    transcript_data = await transcript_queue.get()
-                    await send_transcript_to_client(transcript_data)
-            except asyncio.CancelledError:
-                pass
-        
-        # Start transcript processing task
-        transcript_task = asyncio.create_task(process_transcripts())
-        
-        # Main WebSocket loop - receive audio and put in queue
-        try:
-            while True:
-                audio_data = await websocket.receive_bytes()
-                logger.info(f"Received {len(audio_data)} bytes of audio data")
-                
-                # Put audio data in queue for AssemblyAI
-                if not audio_queue.full():
-                    audio_queue.put(audio_data)
-                else:
-                    logger.warning("Audio queue full, dropping audio data")
+                logger.error(f"Error in WebSocket loop: {e}")
+                connected = False
+                break
                     
-        except WebSocketDisconnect:
-            logger.info("Client disconnected")
-            keep_running.clear()
-        except Exception as e:
-            logger.error(f"Error in WebSocket audio loop: {e}")
-            keep_running.clear()
-        finally:
-            # Stop the audio generator
-            keep_running.clear()
-            
-            # Cancel both tasks
-            streaming_task.cancel()
-            transcript_task.cancel()
-            
-            try:
-                await streaming_task
-            except asyncio.CancelledError:
-                pass
-                
-            try:
-                await transcript_task
-            except asyncio.CancelledError:
-                pass
-
     except WebSocketDisconnect:
         logger.info("Client disconnected from WebSocket.")
     except Exception as e:
         logger.error(f"WebSocket endpoint error: {e}")
     finally:
-        if streaming_client:
-            try:
-                streaming_client.disconnect(terminate=True)
-                logger.info("AssemblyAI StreamingClient disconnected.")
-            except Exception as e:
-                logger.error(f"Error disconnecting streaming client: {e}")
+        logger.info("WebSocket endpoint cleanup completed")
 
 
 @app.get("/health")

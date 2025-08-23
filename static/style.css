@@ -508,10 +508,64 @@ body::before {
   color: white;
 }
 
-/* Click ripple effect */
-.click-ripple {
-  position: absolute;
+::-moz-selection {
+  background: rgba(255, 154, 139, 0.3);
+  color: white;
+}
+
+/* 🎵 DAY 22: Audio Player Styling */
+.meyme-audio-player {
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto 10px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  display: none;
+  height: 54px;
+}
+
+.meyme-audio-player.show {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+}
+
+.meyme-audio-player::-webkit-media-controls-panel {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+}
+
+.meyme-audio-player::-webkit-media-controls-play-button,
+.meyme-audio-player::-webkit-media-controls-pause-button {
+  background: rgba(139, 69, 19, 0.8);
   border-radius: 50%;
+  margin: 0 5px;
+}
+
+.meyme-audio-player::-webkit-media-controls-timeline {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  margin: 0 10px;
+}
+
+.meyme-audio-player::-webkit-media-controls-current-time-display,
+.meyme-audio-player::-webkit-media-controls-time-remaining-display {
+  color: #8b4513;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .meyme-audio-player {
+    max-width: 250px;
+    margin: 15px auto 8px;
+  }
+}
   background: rgba(255, 255, 255, 0.6);
   transform: scale(0);
   animation: ripple-click 0.6s linear;
@@ -552,6 +606,49 @@ body::before {
   25% { transform: scale(1.1); }
   50% { transform: scale(0.95); }
   75% { transform: scale(1.05); }
+}
+
+/* 🎵 DAY 22: Enhanced conversation flow indicators */
+.status-message.speaking {
+  border-left: 4px solid #26c6da;
+  animation: speakingPulse 1.5s ease-in-out infinite alternate;
+}
+
+.status-message.turn-complete {
+  border-left: 4px solid #4caf50;
+  animation: completePulse 0.8s ease-out;
+}
+
+/* Enhanced audio streaming indicator */
+.status-message.audio-streaming {
+  background: linear-gradient(45deg, #26c6da, #00acc1, #26c6da);
+  background-size: 200% 200%;
+  animation: audioStreamGradient 2s ease-in-out infinite;
+  border-left: 4px solid #00bcd4;
+  color: white;
+  font-weight: 600;
+}
+
+@keyframes audioStreamGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Conversation ready state */
+.status-message.conversation-ready {
+  background: linear-gradient(45deg, #66bb6a, #81c784);
+  border-left: 4px solid #2e7d32;
+  animation: readyGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes readyGlow {
+  0% {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  }
+  100% {
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.5), 0 0 20px rgba(76, 175, 80, 0.2);
+  }
 }
 
 /* Enhanced breathing animation */
@@ -781,5 +878,72 @@ body::before {
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
+  }
+}
+
+/* Test Controls */
+.test-controls {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.test-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  outline: none;
+}
+
+.test-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.test-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+}
+
+.test-button:focus {
+  box-shadow: 0 0 0 3px rgba(255, 154, 139, 0.3);
+}
+
+/* Test button loading state */
+.test-button.loading {
+  background: rgba(161, 140, 209, 0.2);
+  border-color: rgba(161, 140, 209, 0.3);
+  animation: testButtonPulse 1.5s ease-in-out infinite;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@keyframes testButtonPulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
   }
 }
