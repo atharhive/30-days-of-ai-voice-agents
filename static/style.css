@@ -80,6 +80,42 @@ body::before {
   overflow: hidden;
 }
 
+/* Card state visual feedback */
+.meyme-card.listening {
+  border: 1px solid rgba(255, 154, 139, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 30px rgba(255, 154, 139, 0.2);
+}
+
+.meyme-card.thinking {
+  border: 1px solid rgba(161, 140, 209, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 30px rgba(161, 140, 209, 0.2);
+  animation: breathe 6s ease-in-out infinite, thinkingGlow 2s ease-in-out infinite;
+}
+
+.meyme-card.speaking {
+  border: 1px solid rgba(26, 198, 218, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 30px rgba(26, 198, 218, 0.2);
+  animation: breathe 6s ease-in-out infinite, speakingGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes thinkingGlow {
+  0%, 100% {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 20px rgba(161, 140, 209, 0.2);
+  }
+  50% {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(161, 140, 209, 0.4);
+  }
+}
+
+@keyframes speakingGlow {
+  0%, 100% {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 20px rgba(26, 198, 218, 0.2);
+  }
+  50% {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 35px rgba(26, 198, 218, 0.4);
+  }
+}
+
 .meyme-pfp {
   width: 120px;
   height: 120px;
@@ -325,16 +361,51 @@ body::before {
 .status-message.listening {
   background: rgba(255, 154, 139, 0.2);
   color: white;
+  border-left: 4px solid #ff9a8b;
+  animation: listeningPulse 2s ease-in-out infinite;
 }
 
 .status-message.thinking {
   background: rgba(161, 140, 209, 0.2);
   color: white;
+  border-left: 4px solid #a18cd1;
+  animation: thinkingPulse 1.5s ease-in-out infinite;
 }
 
 .status-message.error {
   background: rgba(255, 107, 107, 0.2);
   color: white;
+}
+
+@keyframes listeningPulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(255, 154, 139, 0.2);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.005);
+    box-shadow: 0 6px 20px rgba(255, 154, 139, 0.4);
+  }
+}
+
+@keyframes thinkingPulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(161, 140, 209, 0.2);
+  }
+  33% {
+    opacity: 1;
+    transform: scale(1.01);
+    box-shadow: 0 6px 20px rgba(161, 140, 209, 0.4);
+  }
+  66% {
+    opacity: 0.9;
+    transform: scale(1.005);
+    box-shadow: 0 5px 18px rgba(161, 140, 209, 0.3);
+  }
 }
 
 .status-message.speaking {

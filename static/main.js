@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const voiceButton = document.getElementById('voiceButton');
   const micIcon = document.getElementById('micIcon');
   const statusMessage = document.getElementById('statusMessage');
+  const meymeCard = document.querySelector('.meyme-card');
   let isRecording = false;
   let audioContext = null;
   let mediaStreamSource = null;
@@ -20,6 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentAudioSource = null;
   let playbackStartTime = 0;
   let totalPlaybackDuration = 0;
+  
+  // Seamless conversation flow variables
+  let isInConversationMode = false;
+  let silenceTimer = null;
+  let lastAudioLevel = 0;
+  let audioLevelBuffer = [];
+  let silenceThreshold = 0.01; // Threshold for detecting silence
+  let silenceDetectionTime = 2000; // 2 seconds of silence
+  let isProcessingTurn = false; // Flag to prevent multiple turn triggers
 
   const SAMPLE_RATE = 16000; // AssemblyAI required sample rate
   const BUFFER_SIZE = 4096; // Audio processing buffer size
@@ -27,8 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggleRecording = async () => {
     if (isRecording) {
+      // If recording, stop and exit conversation mode
+      isInConversationMode = false;
       stopRecording();
+      statusMessage.textContent = '🎙️ Press the mic button to speak';
+      statusMessage.classList.remove('listening', 'thinking', 'speaking');
+      updateCardState();
     } else {
+      // Start conversation mode
+      isInConversationMode = true;
       await startRecording();
     }
   };
@@ -50,6 +67,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get the audio data from the input buffer (first channel for mono)
         const inputData = e.inputBuffer.getChannelData(0);
+        
+        // Calculate audio level for silence detection
+        let audioLevel = 0;
+        for (let i = 0; i < inputData.length; i++) {
+          audioLevel += Math.abs(inputData[i]);
+        }
+        audioLevel /= inputData.length;
+        lastAudioLevel = audioLevel;
+        
+        // Add to buffer for smoothing
+        audioLevelBuffer.push(audioLevel);
+        if (audioLevelBuffer.length > 10) {
+          audioLevelBuffer.shift();
+        }
+        
+        // Calculate average audio level
+        const avgAudioLevel = audioLevelBuffer.reduce((a, b) => a + b, 0) / audioLevelBuffer.length;
+        
+        // Silence detection logic - only if not already processing
+        if (!isProcessingTurn) {
+          if (avgAudioLevel < silenceThreshold) {
+            if (!silenceTimer) {
+              silenceTimer = setTimeout(() => {
+                console.log('🔇 Detected 2 seconds of silence, triggering LLM response');
+                triggerLLMResponse();
+              }, silenceDetectionTime);
+            }
+          } else {
+            // Clear silence timer if audio detected
+            if (silenceTimer) {
+              clearTimeout(silenceTimer);
+              silenceTimer = null;
+            }
+          }
+        }
 
         // Resample and convert to 16-bit PCM
         const downsampledBuffer = downsampleBuffer(inputData, audioContext.sampleRate, SAMPLE_RATE);
@@ -66,9 +118,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       socket.onopen = () => {
         isRecording = true;
+        isProcessingTurn = false; // Reset processing flag
         updateUIForRecording();
-      statusMessage.textContent = '🎙️ Meyme is listening...';
-        statusMessage.classList.add('show');
+        statusMessage.textContent = '🎙️ Meyme is listening...';
+        statusMessage.classList.remove('thinking', 'speaking', 'turn-complete', 'processing', 'partial');
+        statusMessage.classList.add('show', 'listening');
+        updateCardState();
         
         // 🎵 DAY 22: Stop any ongoing audio playback when starting to record
         if (isPlayingAudio) {
@@ -107,8 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update status message to show audio streaming
             statusMessage.textContent = `🎵 Meyme is speaking...`;
-            statusMessage.classList.remove('turn-complete', 'processing', 'speaking', 'partial');
+            statusMessage.classList.remove('thinking', 'listening', 'processing', 'turn-complete', 'partial');
             statusMessage.classList.add('speaking');
+            updateCardState();
+            
+            // Keep button disabled during speaking
+            voiceButton.disabled = true;
+            voiceButton.classList.add('processing');
             
             return; // Don't process further
           }
@@ -156,36 +216,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // Don't process further
           }
           
-          // Handle different types of transcript messages
+          // Handle different types of transcript messages - Simplified to only trigger thinking state
           if (data.type === 'transcript' && data.transcript) {
-            if (data.is_partial) {
-              // Real-time partial transcript - update immediately with lighter styling
-              console.log(`📝 PARTIAL TRANSCRIPT: "${data.transcript}"`);
-              statusMessage.textContent = data.transcript;
-              statusMessage.classList.remove('turn-complete', 'processing');
-              statusMessage.classList.add('speaking', 'partial');
-            } else if (data.end_of_turn) {
-              // Final transcript for this turn - more solid styling
+            if (data.end_of_turn) {
+              // Final transcript for this turn - show thinking state
               console.log(`✅ FINAL TRANSCRIPT: "${data.transcript}"`);
               console.log(`🎯 Turn completed - triggering AI response`);
-              statusMessage.textContent = data.transcript;
-              statusMessage.classList.remove('speaking', 'partial');
-              statusMessage.classList.add('turn-complete');
               
-              // Show processing AI response indicator
-              setTimeout(() => {
-                statusMessage.textContent = '🤖 Meyme is thinking...';
-                statusMessage.classList.remove('turn-complete');
-                statusMessage.classList.add('processing');
-              }, 1000);
-            } else {
-              // Regular transcript update
-              console.log(`📝 TRANSCRIPT UPDATE: "${data.transcript}"`);
-              statusMessage.textContent = data.transcript;
-              statusMessage.classList.remove('turn-complete', 'processing', 'partial');
-              statusMessage.classList.add('speaking');
+              // Set processing flag
+              isProcessingTurn = true;
+              
+              // Clear silence timer since we're now processing
+              if (silenceTimer) {
+                clearTimeout(silenceTimer);
+                silenceTimer = null;
+              }
+              
+              // Immediately show thinking state
+              statusMessage.textContent = '🤖 Meyme is thinking...';
+              statusMessage.classList.remove('listening', 'speaking', 'partial', 'turn-complete', 'processing');
+              statusMessage.classList.add('thinking');
+              updateCardState();
+              
+              // Disable the button during thinking
+              voiceButton.disabled = true;
+              voiceButton.classList.add('processing');
             }
-          } 
+            // Don't show partial transcripts or other transcript updates in UI
+          }
           else if (data.type === 'turn_end') {
             // Handle explicit turn end messages
             if (data.transcript && data.transcript.trim()) {
@@ -230,33 +288,81 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // New function to trigger LLM response during silence
+  const triggerLLMResponse = () => {
+    if (!isRecording || !socket || socket.readyState !== WebSocket.OPEN || isProcessingTurn) {
+      return;
+    }
+    
+    // Set processing flag to prevent multiple triggers
+    isProcessingTurn = true;
+    
+    // Clear silence timer
+    if (silenceTimer) {
+      clearTimeout(silenceTimer);
+      silenceTimer = null;
+    }
+    
+    // Show thinking state
+    statusMessage.textContent = '🤖 Meyme is thinking...';
+    statusMessage.classList.remove('listening', 'speaking', 'partial', 'turn-complete');
+    statusMessage.classList.add('thinking');
+    updateCardState();
+    
+    // Disable button during processing
+    voiceButton.disabled = true;
+    voiceButton.classList.add('processing');
+    
+    // Signal end of turn to backend
+    try {
+      socket.send(JSON.stringify({
+        type: 'end_turn',
+        message: 'Auto-triggered after silence detected'
+      }));
+      console.log('🎯 ✅ Sent auto end_turn signal after silence detection');
+    } catch (error) {
+      console.error('❌ Error sending auto end_turn signal:', error);
+      isProcessingTurn = false; // Reset flag on error
+    }
+  };
+  
   const stopRecording = () => {
     if (isRecording) {
       isRecording = false;
       
-      // Signal end of turn to backend before closing
-      if (socket && socket.readyState === WebSocket.OPEN) {
+      // Clear silence detection timer
+      if (silenceTimer) {
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+      
+      // Only send end_turn if we're not in conversation mode (manual stop)
+      if (!isInConversationMode && socket && socket.readyState === WebSocket.OPEN) {
         try {
           socket.send(JSON.stringify({
             type: 'end_turn',
-            message: 'User finished speaking'
+            message: 'User manually stopped recording'
           }));
-          console.log('🎯 ✅ Sent end_turn signal to backend');
+          console.log('🎯 ✅ Sent manual end_turn signal to backend');
         } catch (error) {
-          console.error('❌ Error sending end_turn signal:', error);
+          console.error('❌ Error sending manual end_turn signal:', error);
         }
-        
-        // Keep the WebSocket open for audio streaming response
-        // We'll close it after audio streaming completes or timeout
-        console.log('🔌 ℹ️ WebSocket kept open for audio streaming response');
+      }
+      
+      // Keep the WebSocket open for audio streaming response if in conversation mode
+      if (isInConversationMode && socket && socket.readyState === WebSocket.OPEN) {
+        console.log('🔌 ℹ️ WebSocket kept open for audio streaming response in conversation mode');
         
         // Set a timeout to close the connection if no audio response comes
         setTimeout(() => {
-          if (socket && socket.readyState === WebSocket.OPEN) {
+          if (socket && socket.readyState === WebSocket.OPEN && isInConversationMode) {
             console.log('⏰ 🔌 Closing WebSocket after timeout (no audio response)');
             socket.close();
           }
         }, 30000); // 30 second timeout for audio response
+      } else if (!isInConversationMode && socket && socket.readyState === WebSocket.OPEN) {
+        // Close socket immediately if exiting conversation mode
+        socket.close();
       }
       
       if (processor) {
@@ -273,11 +379,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       updateUIForStopped();
-      statusMessage.textContent = '🤖 Meyme is thinking...';
-      statusMessage.classList.remove('speaking', 'partial', 'turn-complete');
-      statusMessage.classList.add('processing');
       
-      console.log('🎯 ✅ Recording stopped and processing initiated');
+      if (!isInConversationMode) {
+        statusMessage.textContent = '🎙️ Press the mic button to speak';
+        statusMessage.classList.remove('listening', 'thinking', 'speaking', 'processing');
+        updateCardState();
+      }
+      
+      console.log('🎯 ✅ Recording stopped');
     }
   };
 
@@ -326,6 +435,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateUIForStopped = () => {
     voiceButton.classList.remove('recording');
     micIcon.className = 'fas fa-microphone';
+  };
+
+  // Function to update card visual state based on status message state
+  const updateCardState = () => {
+    // Remove all state classes
+    meymeCard.classList.remove('listening', 'thinking', 'speaking');
+    
+    // Add current state class based on status message state
+    if (statusMessage.classList.contains('listening')) {
+      meymeCard.classList.add('listening');
+    } else if (statusMessage.classList.contains('thinking')) {
+      meymeCard.classList.add('thinking');
+    } else if (statusMessage.classList.contains('speaking')) {
+      meymeCard.classList.add('speaking');
+    }
   };
 
   // 🎵 DAY 22: SEAMLESS AUDIO PLAYBACK FUNCTIONS
@@ -399,82 +523,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Play a single audio chunk seamlessly
+  // Play a single audio chunk seamlessly - FIXED to handle raw audio data
   async function playAudioChunk(base64Audio, chunkIndex) {
-    try {
-      console.log(`🎵 🚀 PLAYING AUDIO CHUNK #${chunkIndex}`);
-      console.log('🎵' + '-'.repeat(40));
-      
-      // Convert base64 to audio buffer
-      const audioBuffer = await base64ToAudioBuffer(base64Audio, chunkIndex);
-      
-      // Initialize audio context
-      const context = await initPlaybackAudioContext();
-      
-      // Create audio source
-      const source = context.createBufferSource();
-      source.buffer = audioBuffer;
-      
-      // Connect to destination (speakers)
-      source.connect(context.destination);
-      
-      // Calculate when to start playing this chunk
-      let startTime = context.currentTime;
-      
-      if (isPlayingAudio) {
-        // If already playing, schedule this chunk to play after the previous one
-        startTime = Math.max(context.currentTime, playbackStartTime + totalPlaybackDuration);
-      } else {
-        // First chunk - start immediately
-        isPlayingAudio = true;
-        playbackStartTime = context.currentTime;
-        totalPlaybackDuration = 0;
-        
-        console.log('🎵 ✅ STARTING SEAMLESS AUDIO PLAYBACK PIPELINE');
-      }
-      
-      // Update total duration
-      totalPlaybackDuration += audioBuffer.duration;
-      
-      console.log(`🎵 📅 AUDIO TIMING:`);
-      console.log(`   ⏱️  Start time: ${(startTime - context.currentTime).toFixed(3)}s from now`);
-      console.log(`   ⏱️  Chunk duration: ${audioBuffer.duration.toFixed(3)}s`);
-      console.log(`   ⏱️  Total pipeline duration: ${totalPlaybackDuration.toFixed(3)}s`);
-      
-      // Start playing at the calculated time
-      source.start(startTime);
-      
-      // Handle playback completion
-      source.onended = () => {
-        console.log(`🎵 ✅ CHUNK #${chunkIndex} PLAYBACK COMPLETED`);
-        
-        // Check if this is the last chunk playing
-        if (context.currentTime >= playbackStartTime + totalPlaybackDuration - 0.1) {
-          console.log('🎵 🎉 ALL AUDIO CHUNKS PLAYBACK COMPLETED!');
-          isPlayingAudio = false;
-          playbackStartTime = 0;
-          totalPlaybackDuration = 0;
-          
-          // Update UI to show conversation is ready
-          setTimeout(() => {
-            statusMessage.textContent = '🎙️ Press the mic button to speak';
-            statusMessage.classList.remove('speaking', 'processing');
-          }, 500);
-        }
-      };
-      
-      // Store reference to current source
-      currentAudioSource = source;
-      
-      console.log(`🎵 ✅ CHUNK #${chunkIndex} QUEUED FOR SEAMLESS PLAYBACK`);
-      console.log('🎵' + '-'.repeat(40));
-      
-    } catch (error) {
-      console.error(`❌ Error playing audio chunk #${chunkIndex}:`, error);
-      
-      // Fallback - try to continue with next chunk
-      console.log('⚠️  Attempting to continue with next audio chunk...');
-    }
+    // Skip individual chunk playback - we'll use the complete audio approach instead
+    console.log(`🎵 📦 RECEIVED AUDIO CHUNK #${chunkIndex} - queuing for complete playback`);
+    return;
   }
   
   // Stop current audio playback (useful for interruptions)
@@ -663,7 +716,13 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           accumulatedAudioChunks = [];
           statusMessage.textContent = '🎙️ Press the mic button to speak';
-          statusMessage.classList.remove('speaking', 'processing');
+          statusMessage.classList.remove('speaking', 'processing', 'thinking');
+          updateCardState();
+          
+          // Re-enable the button
+          voiceButton.disabled = false;
+          voiceButton.classList.remove('processing');
+          
           console.log('🧹 ✅ Ready for new conversation');
         }, 500);
       };
@@ -736,14 +795,23 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPlaybackDuration = 0;
         currentAudioSource = null;
         
-        // Update UI to show conversation is complete and ready for next input
+        // Update UI based on conversation mode
         setTimeout(() => {
           // Clear accumulated chunks for next conversation
           accumulatedAudioChunks = [];
-          statusMessage.textContent = '🎙️ Press the mic button to speak';
-          statusMessage.classList.remove('speaking', 'processing');
-          console.log('🧹 ✅ Cleared accumulated audio chunks for next conversation');
-          console.log('🧹 ✅ Ready for new audio streaming session');
+          isProcessingTurn = false; // Reset processing flag
+          
+          if (isInConversationMode) {
+            // In conversation mode - restart listening automatically
+            console.log('🔄 Conversation mode: Automatically restarting listening after assembled audio');
+            restartListening();
+          } else {
+            // Not in conversation mode - show ready state
+            statusMessage.textContent = '🎙️ Press the mic button to speak';
+            statusMessage.classList.remove('speaking', 'processing');
+            console.log('🧹 ✅ Cleared accumulated audio chunks for next conversation');
+            console.log('🧹 ✅ Ready for new audio streaming session');
+          }
         }, 500);
       };
       
@@ -805,6 +873,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioBuffer = await base64ToAudioBuffer(base64Audio, 'LEGACY');
     await playAssembledAudio(audioBuffer);
   }
+
+  // Function to restart listening in conversation mode
+  const restartListening = async () => {
+    if (!isInConversationMode) {
+      return;
+    }
+    
+    console.log('🔄 🎙️ Restarting listening for continuous conversation');
+    
+    // Reset audio level buffer and processing flag for new listening session
+    audioLevelBuffer = [];
+    lastAudioLevel = 0;
+    isProcessingTurn = false;
+    
+    // Start recording again
+    try {
+      await startRecording();
+    } catch (error) {
+      console.error('❌ Error restarting listening:', error);
+      // Exit conversation mode on error
+      isInConversationMode = false;
+      isProcessingTurn = false;
+      statusMessage.textContent = '❌ Error restarting conversation';
+      statusMessage.classList.remove('listening', 'thinking', 'speaking');
+      updateCardState();
+      voiceButton.disabled = false;
+      voiceButton.classList.remove('processing');
+    }
+  };
 
   voiceButton.addEventListener('click', toggleRecording);
 });

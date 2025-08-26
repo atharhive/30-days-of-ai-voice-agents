@@ -16,6 +16,13 @@ import websockets
 import json
 import base64
 
+# Import agent skills
+from agent_skills import (
+    SKILL_FUNCTION_DECLARATIONS,
+    execute_skill_function,
+    SKILL_FUNCTIONS
+)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -272,12 +279,14 @@ async def murf_websocket_tts(text_chunks: list, context_id: str = "day20_context
 
 async def stream_llm_response_with_murf_tts(user_text: str, session_id: str, client_websocket: WebSocket = None) -> str:
     """
-    Stream LLM response from Gemini, send chunks to Murf WebSocket for TTS,
+    Stream LLM response from Gemini with function calling support, send chunks to Murf WebSocket for TTS,
     and return the complete response. Prints base64 audio to console.
     """
     try:
         # Initialize history for this session
         history = chat_histories.get(session_id, [])
+        
+        # Create model with function calling tools
         model = genai.GenerativeModel(
             "gemini-1.5-flash",
             system_instruction=MEYME_SYSTEM_PROMPT
@@ -307,16 +316,116 @@ async def stream_llm_response_with_murf_tts(user_text: str, session_id: str, cli
         text_chunks = []
         chunk_count = 0
         
-        # Use Gemini's streaming API
-        response_stream = chat.send_message(user_text, stream=True)
+        # Check if user message might need skills and use appropriate model
+        user_lower = user_text.lower()
+        needs_skills = any(keyword in user_lower for keyword in [
+            'weather', 'forecast', 'temperature', 'rain', 'sunny', 'cloudy',
+            'search', 'news', 'latest', 'current', 'recent', 'what\'s happening',
+            'tell me about', 'find information'
+        ])
         
-        for chunk in response_stream:
-            if chunk.text:
-                chunk_count += 1
-                # Print each chunk as it arrives with enhanced formatting
-                print(chunk.text, end="", flush=True)
-                accumulated_response += chunk.text
-                text_chunks.append(chunk.text)
+        if needs_skills:
+            print(f"\n🛠️ SKILLS DETECTED - Using function calling mode")
+            
+            # Create tools for function calling
+            from google.generativeai.types import Tool, FunctionDeclaration
+            
+            # Convert our function declarations to Gemini format
+            tools = []
+            for func_decl in SKILL_FUNCTION_DECLARATIONS:
+                tools.append(FunctionDeclaration(
+                    name=func_decl['name'],
+                    description=func_decl['description'],
+                    parameters=func_decl['parameters']
+                ))
+            
+            # Send message with tools
+            response = chat.send_message(
+                user_text,
+                tools=[Tool(function_declarations=tools)]
+            )
+            
+            # Check if the model wants to call a function
+            if response.candidates[0].content.parts:
+                for part in response.candidates[0].content.parts:
+                    if hasattr(part, 'function_call') and part.function_call:
+                        function_call = part.function_call
+                        function_name = function_call.name
+                        function_args = dict(function_call.args)
+                        
+                        print(f"\n🛠️ SKILL ACTIVATION: {function_name}")
+                        print("🛠️" * 50)
+                        print(f"📞 Function: {function_name}")
+                        print(f"📋 Arguments: {function_args}")
+                        print("🛠️" * 50)
+                        
+                        # Execute the skill function
+                        skill_result = execute_skill_function(function_name, function_args)
+                        
+                        print(f"\n📊 SKILL RESULT:")
+                        print("📊" * 30)
+                        if skill_result.get('success'):
+                            print(f"✅ Skill executed successfully")
+                            if function_name == 'search_web' and skill_result.get('answer'):
+                                print(f"🔍 Quick Answer: {skill_result['answer'][:200]}...")
+                                print(f"📊 Found {skill_result.get('total_results', 0)} results")
+                            elif function_name in ['get_current_weather', 'get_weather_forecast']:
+                                if skill_result.get('weather'):
+                                    weather = skill_result['weather']
+                                    temp = skill_result.get('temperature', {})
+                                    location = skill_result.get('location', {})
+                                    print(f"🌤️ {location.get('name', 'Unknown')}: {weather.get('description', 'N/A')}")
+                                    if temp.get('current'):
+                                        print(f"🌡️ Temperature: {temp['current']}{temp.get('units', '')}")
+                        else:
+                            print(f"❌ Skill failed: {skill_result.get('error', 'Unknown error')}")
+                        print("📊" * 30)
+                        
+                        # Create a simple text response incorporating the skill result
+                        if skill_result.get('success'):
+                            if function_name == 'get_current_weather':
+                                location = skill_result['location']
+                                weather = skill_result['weather']
+                                temp = skill_result['temperature']
+                                accumulated_response = f"The weather in {location['name']} is currently {weather['description'].lower()} with a temperature of {temp['current']}{temp['units']}. It feels like {temp['feels_like']}{temp['units']} with {skill_result['humidity']}% humidity."
+                            elif function_name == 'get_weather_forecast':
+                                location = skill_result['location']
+                                forecast_text = f"Here's the {skill_result['days_requested']}-day forecast for {location['name']}: "
+                                for day in skill_result['forecast'][:2]:  # Limit to 2 days for voice
+                                    forecast_text += f"{day['day_name']}: {day['weather']['description']}, high of {day['temperature']['max']}{day['temperature']['units']}, low of {day['temperature']['min']}{day['temperature']['units']}. "
+                                accumulated_response = forecast_text
+                            elif function_name == 'search_web':
+                                if skill_result.get('answer'):
+                                    accumulated_response = f"Based on my search, {skill_result['answer']}"
+                                else:
+                                    accumulated_response = f"I searched for '{skill_result['query']}' and found {skill_result['total_results']} results, but couldn't get a clear answer."
+                        else:
+                            accumulated_response = f"I tried to help with that, but {skill_result.get('error', 'something went wrong')}."
+                        
+                        text_chunks = [accumulated_response]
+                        
+                        print(f"\n🤖 FINAL RESPONSE (with skill data):")
+                        print("=" * 60)
+                        print(accumulated_response)
+                        print("=" * 60)
+                        
+                    elif part.text:
+                        # Regular text response without function call
+                        accumulated_response += part.text
+                        text_chunks.append(part.text)
+                        print(part.text, end="", flush=True)
+            
+            # If no function call, just use the regular response
+            if not accumulated_response:
+                accumulated_response = response.text or ""
+                text_chunks = [accumulated_response] if accumulated_response else []
+        else:
+            # No skills needed - use regular streaming response
+            print(f"\n💬 REGULAR RESPONSE MODE - No skills needed")
+            response = chat.send_message(user_text)
+            accumulated_response = response.text or ""
+            text_chunks = [accumulated_response] if accumulated_response else []
+            print(accumulated_response)
         
         print()  # New line after streaming
         print("=" * 80)
@@ -541,7 +650,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                             break
                                     
                                     # Generate LLM response and stream TTS audio
-                                    session_id = f"ws_session_{audio_chunk_count}"
+                                    # Use consistent session ID for memory continuity
+                                    session_id = f"ws_session_{id(websocket)}"  # Unique per WebSocket connection
                                     try:
                                         llm_response = await stream_llm_response_with_murf_tts(
                                             user_text, session_id, websocket
@@ -642,7 +752,8 @@ async def websocket_endpoint(websocket: WebSocket):
                                                     break
                                             
                                             # Generate LLM response and stream TTS audio
-                                            session_id = f"ws_session_{audio_chunk_count}"
+                                            # Use consistent session ID for memory continuity
+                                            session_id = f"ws_session_{id(websocket)}"  # Unique per WebSocket connection
                                             try:
                                                 llm_response = await stream_llm_response_with_murf_tts(
                                                     user_text, session_id, websocket
