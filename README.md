@@ -8,6 +8,10 @@
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://html.spec.whatwg.org)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://www.w3.org/Style/CSS)
 
+### 🎤 Demo
+- 🌍 [Live Website](https://meyme-the-cat.onrender.com/)
+- 🎥 [Watch Video](https://your-video-link.com)
+
 ## 🎯 What is Meyme?
 
 Meet **Meyme** — she's not just another AI assistant. She's a fiercely loyal, cozy, and cunning cat companion with a lethal streak of sass. Built with cutting-edge voice AI technology, Meyme brings personality to every conversation. She's warm and affectionate with her owner Athar, but everyone else? Well, let's just say you're probably wasting her precious nap time.
