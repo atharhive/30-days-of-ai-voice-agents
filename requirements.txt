@@ -1,4 +1,4 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 python-dotenv
 requests
@@ -7,4 +7,3 @@ assemblyai
 google-generativeai
 websockets
 google-search-results
-murfai
