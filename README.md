@@ -60,9 +60,14 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 | 19 | **Streaming LLM Responses** - Integrated streaming LLM responses with real-time console output. When final transcript received from AssemblyAI → sends to Gemini streaming API → prints response chunks live to console | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_30daysofvoiceagents-murfai-assemblyai-activity-7363948006980677632-kKs5?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
 | 20 | **Murf WebSocket TTS Integration** - Integrated Murf WebSocket API for real-time text-to-speech with base64 audio streaming and console output | [LinkedIn Post](https://linkedin.com/in/your-profile) |
 | 21 | **Streaming Audio Data to Client** - Stream base64 audio chunks from Murf TTS to client via WebSocket, accumulate chunks in array, and print client acknowledgments | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_day-21-of-my-30-days-of-ai-voice-agents-activity-7364722864282853376-WViK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 22 | **Seamless Audio Streaming** - Implemented seamless audio streaming playback, Murf-style WAV chunk assembly, professional UI with audio controls, real-time streaming + complete playback, error handling and fallbacks, and memory-efficient blob management. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofai-voice-agents-activity-7365069188362670080-Aq9C?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
-| 22 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
-| 23 | soon | [LinkedIn Post](https://linkedin.com/in/your-profile) |
+| 22 | **Seamless Audio Playback** - Implemented seamless playback of streaming audio, ensuring audio chunks play smoothly in the UI. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofai-voice-agents-activity-7365069188362670080-Aq9C?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD0KOh0BF8MN-8IUUp-M20P5OqViogEHdJc) |
+| 23 | **Full End-to-End Agent** - Assembled the complete voice agent pipeline, from user speech to transcribed text, LLM response, and streamed audio playback. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7365421194539814912-R6a-?utm_source=share&utm_medium=member_desktop) |
+| 24 | **Agent Persona** - Integrated a distinct agent persona, giving the voice assistant a unique character and conversational style. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7365781861299015680-o4T0?utm_source=share&utm_medium=member_desktop) |
+| 25 | **Special Skill 1: Web Search** - Added a special skill to the agent, like the ability to search the web or fetch real-time information. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7366108990999941120-Y53r?utm_source=share&utm_medium=member_desktop) |
+| 26 | **Special Skill 2: Code Interpreter** - Implemented a second special skill, expanding the agent's capabilities. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7366495942919344128-222b?utm_source=share&utm_medium=member_desktop) |
+| 27 | **UI Revamp & API Key Input** - Revamped the UI, improved the code, and added a feature for users to input their own API keys. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7366858336993955840-Yqj3?utm_source=share&utm_medium=member_desktop) |
+| 28 | **Deployment** - Deployed the application to a public cloud service, making the voice agent accessible via a public URL. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7367219499990364160-oH3l?utm_source=share&utm_medium=member_desktop) |
+| 29 | **Final Documentation** - Completed the project documentation by updating the `README.md` file. | [LinkedIn Post](https://www.linkedin.com/posts/md-athar-jamal-makki-165b67246_buildwithmurf-30daysofvoiceagents-activity-7367479559391039488-D6uT?utm_source=share&utm_medium=member_desktop) |
 
 
 
@@ -87,17 +92,24 @@ This project is part of the **30 Days of AI Voice Agents Challenge** by **Murf A
 
 ## ✨ Features
 
-🎙️ **Real-time Voice Conversations** - Talk naturally with Meyme, no typing required  
-🎭 **Unique Personality** - Sassy, loyal cat with distinct conversational style  
-📱 **Modern UI/UX** - Glassmorphic design with smooth animations and audio visualizations  
-🔄 **Session Persistence** - Remembers conversation context throughout your chat  
-⚡ **Fast Response Times** - Optimized pipeline for near real-time interactions  
-🛡️ **Error Handling** - Graceful fallbacks when services are unavailable  
-🎵 **Audio Visualizations** - Beautiful real-time audio feedback during recording and playback  
-🔌 **WebSocket Streaming** - Real-time websocket connection for bi-directional communication  
-🎯 **Turn Detection** - Smart detection of when users finish speaking with confidence indicators  
-🚀 **Streaming LLM Responses** - Real-time LLM response streaming with live console output as AI "thinks"  
-🎵 **Streaming Audio to Client** - Real-time base64 audio streaming from Murf TTS to client with chunk accumulation
+🎙️ **Real-time Voice Conversations** - Talk naturally with Meyme, no typing required.  
+🎭 **Unique Personality** - Sassy, loyal cat with a distinct conversational style.  
+🧩 **Special Skills (Function Calling)** - Ability to perform tasks like web search or execute code.  
+📱 **Modern UI/UX** - Glassmorphic design with smooth animations and audio visualizations.  
+🔄 **Session Persistence** - Remembers conversation context throughout your chat.  
+⚡ **Streaming-First Architecture** - Optimized end-to-end streaming pipeline for near real-time interactions.  
+🛡️ **Error Handling** - Graceful fallbacks when services are unavailable.  
+🔑 **User-Provided API Keys** - A UI section to allow users to provide their own API keys.  
+🎯 **Turn Detection** - Smart detection of when users finish speaking.
+
+## 📚 Documentation
+
+For a deeper dive into the project's architecture, code, and development journey, please visit the [docs](./docs/) directory. It contains:
+
+- **[Architecture & Workflow](./docs/architecture.md):** A detailed explanation of the system design and data flow.
+- **[Code Explained](./docs/code_explained.md):** A breakdown of the project structure and the role of each file.
+- **[Product Requirements (PRD)](./docs/prd.md):** The vision, goals, and features of the agent.
+- **[Tasks & Resources](./docs/resources.md):** A day-by-day guide to the 30-day challenge.
 
 ## 🚀 Getting Started
 
