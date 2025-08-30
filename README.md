@@ -2,9 +2,16 @@
 
 > A cozy, modern AI voice companion with personality — built for the 30 Days of AI Voice Agents Challenge by Murf AI
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://javascript.com)
+<p align="center">
+  <a href="https://www.assemblyai.com/" target="_blank"><img src="https://img.shields.io/badge/AssemblyAI-FF6B35?style=for-the-badge&logo=assemblyai&logoColor=white" alt="AssemblyAI"></a>
+  <a href="https://gemini.google.com/" target="_blank"><img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Google Gemini"></a>
+  <a href="https://murf.ai/" target="_blank"><img src="https://img.shields.io/badge/Murf%20AI-7B68EE?style=for-the-badge" alt="Murf AI"></a>
+  <a href="https://fastapi.tiangolo.com/" target="_blank"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=FastAPI&logoColor=white" alt="FastAPI"></a>
+  <a href="https://en.wikipedia.org/wiki/WebSocket" target="_blank"><img src="https://img.shields.io/badge/WebSockets-000000?style=for-the-badge&logo=websockets&logoColor=white" alt="WebSockets"></a>
+  <a href="https://www.python.org" target="_blank"><img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank"><img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank"><img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"></a>
+</p>
 
 ### 🎤 Demo
 
