@@ -34,16 +34,16 @@ The final architecture is built around a **fully streaming, WebSocket-based pipe
 
 ```mermaid
 graph TD
-    A[User Mic] --> B{Frontend (JavaScript)};
-    B -- WebSocket Audio Chunks --> C{Backend (FastAPI)};
-    C -- Streams Audio --> D[AssemblyAI];
-    D -- Returns Final Transcript --> C;
-    C -- Sends Transcript --> E[Google Gemini];
-    E -- Streams Response Chunks --> C;
-    C -- Streams Text Chunks --> F[Murf AI];
-    F -- Streams Audio Chunks --> C;
-    C -- WebSocket Audio Chunks --> B;
-    B --> G[User Speaker];
+    A[User Mic] --> B{Frontend (JavaScript)}
+    B -- WebSocket Audio Chunks --> C{Backend (FastAPI)}
+    C -- Streams Audio --> D[AssemblyAI]
+    D -- Returns Final Transcript --> C
+    C -- Sends Transcript --> E[Google Gemini]
+    E -- Streams Response Chunks --> C
+    C -- Streams Text Chunks --> F[Murf AI]
+    F -- Streams Audio Chunks --> C
+    C -- WebSocket Audio Chunks --> B
+    B --> G[User Speaker]
 ```
 
 **Tech Stack:**
