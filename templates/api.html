@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌸 Meyme - API Configuration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/736x/70/aa/5b/70aa5b9544ef08fbac01f4d50898d2c5.jpg">
+</head>
+<body>
+    <div class="floral-decoration"></div>
+    <div class="floral-decoration"></div>
+    <div class="floral-decoration"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">🌸 Meyme</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/meyme">Meyme</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/api">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/get-api">Get API</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content - Compact Single Card -->
+    <div class="container">
+        <div class="glass-card">
+            <h1 class="hero-title" style="font-size: 2rem; margin-bottom: 1rem;">🔧 API Configuration</h1>
+            <p class="hero-subtitle" style="margin-bottom: 2rem;">
+                Configure your API keys to enable Meyme's functionality.
+            </p>
+                    
+            <form id="apiConfigForm">
+                <div class="row mb-3">
+                    <div class="col-md-1 text-center">
+                        <div class="feature-icon orange" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-11">
+                        <h6 style="color: #FF6B95; font-weight: 700; margin-bottom: 0.5rem;">MURF AI</h6>
+                        <input type="password" class="form-control" id="murfApiKey" 
+                               placeholder="Enter your MURF API key" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-1 text-center">
+                        <div class="feature-icon purple" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-11">
+                        <h6 style="color: #A94DFF; font-weight: 700; margin-bottom: 0.5rem;">AssemblyAI</h6>
+                        <input type="password" class="form-control" id="assemblyAiApiKey" 
+                               placeholder="Enter your AssemblyAI API key" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-1 text-center">
+                        <div class="feature-icon red" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-11">
+                        <h6 style="color: #FF3D6A; font-weight: 700; margin-bottom: 0.5rem;">Google Gemini</h6>
+                        <input type="password" class="form-control" id="geminiApiKey" 
+                               placeholder="Enter your Gemini API key" required>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-1 text-center">
+                        <div class="feature-icon blue" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-11">
+                        <h6 style="color: #4FC3F7; font-weight: 700; margin-bottom: 0.5rem;">SerpAPI (Optional)</h6>
+                        <input type="password" class="form-control" id="serpApiKey" 
+                               placeholder="Enter your SerpAPI key (optional)">
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="modern-btn">
+                        <i class="fas fa-save"></i>
+                        Save Configuration
+                    </button>
+                    <a href="/get-api" class="modern-btn">
+                        <i class="fas fa-question-circle"></i>
+                        Need API Keys?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load existing API keys on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const keys = ['murfApiKey', 'assemblyAiApiKey', 'geminiApiKey', 'serpApiKey'];
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    document.getElementById(key).value = value;
+                }
+            });
+        });
+
+        // Save API keys
+        document.getElementById('apiConfigForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const keys = ['murfApiKey', 'assemblyAiApiKey', 'geminiApiKey', 'serpApiKey'];
+            keys.forEach(key => {
+                const value = document.getElementById(key).value;
+                if (value) {
+                    localStorage.setItem(key, value);
+                }
+            });
+            
+            alert('API keys saved successfully! 🌸');
+        });
+    </script>
+</body>
+</html>

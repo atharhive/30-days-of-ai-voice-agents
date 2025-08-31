@@ -22,9 +22,29 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/")
+async def root(request: Request):
+    """Redirect root to home page."""
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/home")
 async def home(request: Request):
-    """Serves the main HTML page."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    """Serves the home page."""
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/meyme")
+async def meyme(request: Request):
+    """Serves the Meyme chat page."""
+    return templates.TemplateResponse("meyme.html", {"request": request})
+
+@app.get("/api")
+async def api_config(request: Request):
+    """Serves the API configuration page."""
+    return templates.TemplateResponse("api.html", {"request": request})
+
+@app.get("/get-api")
+async def get_api(request: Request):
+    """Serves the Get API keys guide page."""
+    return templates.TemplateResponse("get-api.html", {"request": request})
 
 
 @app.websocket("/ws")

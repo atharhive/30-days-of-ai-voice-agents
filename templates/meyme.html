@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🌸 Meyme - Cozy AI Assistant</title>
+    <title>🌸 Meyme - Chat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,24 +13,53 @@
     <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/736x/70/aa/5b/70aa5b9544ef08fbac01f4d50898d2c5.jpg">
 </head>
 <body>
-    <div class="floating-particles"></div>
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="chat-container glassmorphism breathing">
+    <div class="floral-decoration"></div>
+    <div class="floral-decoration"></div>
+    <div class="floral-decoration"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">🌸 Meyme</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/meyme">Meyme</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/get-api">Get API</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+        <div class="chat-container glassmorphism">
             <div class="chat-header text-center mb-2">
                 <div class="avatar-container">
                     <img src="https://i.pinimg.com/736x/70/aa/5b/70aa5b9544ef08fbac01f4d50898d2c5.jpg" 
-                         alt="Meyme Avatar" class="avatar-img breathing-gentle" id="avatarImg">
+                         alt="Meyme Avatar" class="avatar-img" id="avatarImg">
                     <div class="avatar-glow"></div>
                 </div>
                 <h2 class="app-title">🌸 Meyme</h2>
                 <p class="app-subtitle">Mmm, Quit talking… my nap can't wait.</p>
-                <button id="settingsBtn" class="settings-btn glassmorphism-btn">
+                <button id="settingsBtn" class="settings-btn">
                     <i class="fas fa-cog"></i>
                 </button>
             </div>
             <div id="chat-log" class="chat-log glassmorphism-inner"></div>
             <div class="chat-input-container text-center mt-2">
-                <button id="recordBtn" class="record-btn glassmorphism-btn">
+                <button id="recordBtn" class="record-btn">
                     <i class="fas fa-microphone"></i>
                 </button>
                 <div id="statusDisplay" class="status-display">Ready for a cozy chat! 😴</div>

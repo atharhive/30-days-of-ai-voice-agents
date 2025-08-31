@@ -1,4 +1,4 @@
-/* 🌸 Meyme - New Custom Theme */
+/* 🌸 Meyme - Modern Mobile Frosted Glass UI */
 * {
     margin: 0;
     padding: 0;
@@ -7,44 +7,99 @@
 
 body {
     font-family: 'Nunito', sans-serif;
-    background: linear-gradient(90deg, #DE8389, #E2BDAF);
+    background: linear-gradient(135deg, #FDEDE8 0%, #FFF6F2 100%),
+                radial-gradient(circle 800px at 15% 20%, #FF6B95 0%, #FF9E48 50%, transparent 70%),
+                radial-gradient(circle 600px at 10% 85%, #A94DFF 0%, #FF5F96 50%, transparent 70%),
+                radial-gradient(circle 700px at 85% 50%, #FF3D6A 0%, #FF9E48 50%, transparent 70%);
+    background-attachment: fixed;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
     color: #333;
+    padding: 1rem;
+}
+
+/* Floating floral elements */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle 100px at 15% 25%, rgba(255, 182, 193, 0.2) 0%, transparent 60%),
+        radial-gradient(circle 80px at 85% 20%, rgba(221, 160, 221, 0.15) 0%, transparent 55%),
+        radial-gradient(circle 120px at 75% 75%, rgba(240, 230, 140, 0.1) 0%, transparent 50%),
+        radial-gradient(circle 60px at 25% 80%, rgba(255, 192, 203, 0.18) 0%, transparent 65%);
+    animation: floralFloat 25s ease-in-out infinite;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle 70px at 40% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle 50px at 80% 60%, rgba(255, 214, 232, 0.1) 0%, transparent 45%),
+        radial-gradient(circle 90px at 20% 70%, rgba(255, 182, 193, 0.08) 0%, transparent 55%);
+    animation: floralFloat 18s ease-in-out infinite reverse;
+}
+
+@keyframes floralFloat {
+    0%, 100% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-15px) scale(1.05);
+        opacity: 1;
+    }
 }
 
 .container {
     position: relative;
-    z-index: 1;
+    z-index: 10;
 }
 
-/* Main chat container with a softer glassmorphism */
+/* Chat Container - Single Frosted Glass Card */
 .chat-container {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 650px;
-    padding: 1.8rem;
+    max-width: 600px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    height: 88vh;
-    position: relative;
-    margin: auto;
+    min-height: 70vh;
+    margin: 0 auto;
+    transition: all 0.3s ease;
 }
 
 .glassmorphism {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(16px) saturate(180%);
-    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
 .glassmorphism-inner {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
 
@@ -351,26 +406,359 @@ body {
     }
 }
 
+/* Navigation Card - Long Rectangle */
+.navbar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 2rem;
+    padding: 1rem 2rem;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+.navbar-brand {
+    color: #FF6B95 !important;
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #666 !important;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    margin: 0 0.2rem;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 15px rgba(255, 107, 149, 0.3);
+}
+
+/* Frosted Glass Cards */
+.glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.glass-card-large {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 3rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.glass-card-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Buttons */
+.modern-btn {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 1rem 2rem;
+    color: #666;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.modern-btn:hover {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 25px rgba(255, 107, 149, 0.3);
+    text-decoration: none;
+}
+
+.modern-btn i {
+    margin-right: 0.5rem;
+}
+
+/* API card styling */
+.api-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.api-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.api-card h3, .api-card h4 {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.api-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.api-link {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    box-shadow: 0px 4px 15px rgba(255, 107, 149, 0.2);
+}
+
+.api-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 25px rgba(255, 107, 149, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Hero section */
+.hero-section {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.hero-title {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Feature Icons */
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon.orange {
+    background: linear-gradient(135deg, #FF9E48, #FF6B95);
+}
+
+.feature-icon.purple {
+    background: linear-gradient(135deg, #A94DFF, #FF5F96);
+}
+
+.feature-icon.red {
+    background: linear-gradient(135deg, #FF3D6A, #FF9E48);
+}
+
+.feature-icon.blue {
+    background: linear-gradient(135deg, #4FC3F7, #29B6F6);
+}
+
+.feature-icon.green {
+    background: linear-gradient(135deg, #66BB6A, #4CAF50);
+}
+
+/* Form Controls */
+.form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    color: #333;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #FF6B95;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 149, 0.15);
+}
+
+/* Modal Styling */
+.modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 107, 149, 0.2);
+}
+
+.modal-title {
+    background: linear-gradient(135deg, #FF6B95, #FF9E48);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+/* Floral decoration elements */
+.floral-decoration {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 182, 193, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floralFloat 8s ease-in-out infinite;
+}
+
+.floral-decoration:nth-child(1) {
+    top: 10%;
+    right: 10%;
+    animation-delay: 0s;
+}
+
+.floral-decoration:nth-child(2) {
+    bottom: 15%;
+    left: 5%;
+    animation-delay: 2s;
+}
+
+.floral-decoration:nth-child(3) {
+    top: 60%;
+    right: 5%;
+    animation-delay: 4s;
+    width: 60px;
+    height: 60px;
+}
+
+@keyframes floralFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+        opacity: 0.9;
+    }
+}
+
+/* Compact table styling */
+.table-borderless td {
+    border: none;
+    padding: 0.8rem 0.5rem;
+    vertical-align: middle;
+}
+
+/* Compact spacing */
+.compact-section {
+    margin-bottom: 1rem;
+}
+
+.compact-card {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
-    .chat-container {
-        margin: 1rem;
+    body {
+        padding: 0.5rem;
+    }
+    
+    .glass-card, .glass-card-large {
         padding: 1.5rem;
-        height: 90vh;
+        margin-bottom: 1rem;
+    }
+    
+    .navbar {
+        padding: 0.8rem 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chat-container {
+        padding: 1.5rem;
+        min-height: 60vh;
     }
     
     .avatar-img {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .app-title {
-        font-size: 1.6rem;
+        width: 60px;
+        height: 60px;
     }
     
     .record-btn {
-        width: 75px;
-        height: 75px;
-        font-size: 1.5rem;
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+    
+    .modern-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        margin: 0.3rem;
+    }
+    
+    .feature-icon {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .table-borderless td {
+        padding: 0.5rem 0.3rem;
     }
 }
