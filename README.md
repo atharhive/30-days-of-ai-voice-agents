@@ -16,7 +16,7 @@
 ### 🎤 Demo
 
 - 🌍 **[Live Website](https://meyme-the-cat.onrender.com/)**
-- 🎥 **[Watch the Video](https://your-video-link.com)** (coming soon)
+- 🎥 **[Watch the Video](https://youtu.be/Ka7xC2NPk_k)**
 
 ## 🎯 What is Meyme?
 
