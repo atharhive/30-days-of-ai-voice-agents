@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let ws = null;
   let audioContext;
   let mediaStream;
-  let processor;
+  let workletNode;
   let audioQueue = [];
   let isPlaying = false;
   let assistantMessageDiv = null;
@@ -150,20 +150,19 @@ document.addEventListener("DOMContentLoaded", () => {
         sampleRate: 16000,
       });
 
+      await audioContext.audioWorklet.addModule("static/audio-processor.js");
+
       const source = audioContext.createMediaStreamSource(mediaStream);
-      processor = audioContext.createScriptProcessor(4096, 1, 1);
-      source.connect(processor);
-      processor.connect(audioContext.destination);
-      processor.onaudioprocess = (e) => {
-        const inputData = e.inputBuffer.getChannelData(0);
-        const pcmData = new Int16Array(inputData.length);
-        for (let i = 0; i < inputData.length; i++) {
-          pcmData[i] = Math.max(-1, Math.min(1, inputData[i])) * 32767;
-        }
+      workletNode = new AudioWorkletNode(audioContext, "audio-processor");
+      
+      workletNode.port.onmessage = (event) => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(pcmData.buffer);
+          ws.send(event.data);
         }
       };
+
+      source.connect(workletNode);
+      workletNode.connect(audioContext.destination);
 
       const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
@@ -204,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const stopRecording = () => {
-    if (processor) processor.disconnect();
+    if (workletNode) workletNode.disconnect();
     if (mediaStream) mediaStream.getTracks().forEach((track) => track.stop());
     if (ws) ws.close();
 
