@@ -59,7 +59,7 @@ def should_search_web(user_query: str, api_key: str) -> bool:
     """
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         prompt = f"Does the following query require a web search to answer accurately? Respond with only 'yes' or 'no'.\n\nQuery: '{user_query}'"
         response = model.generate_content(prompt)
         return response.text.strip().lower() == "yes"
@@ -71,7 +71,7 @@ def get_llm_response(user_query: str, history: List[Dict[str, Any]], api_key: st
     """Gets a response from the Gemini LLM and updates chat history."""
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_instructions)
+        model = genai.GenerativeModel('gemini-2.0-flash-exp', system_instruction=system_instructions)
         chat = model.start_chat(history=history)
         response = chat.send_message(user_query)
         return response.text, chat.history
