@@ -1,0 +1,19 @@
+name: Feature Request
+description: Propose a new feature, persona skill, or integration
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Share your ideas for improving Meyme's conversational flow or skills.
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature Description
+      description: What new functionality would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case & Motivation
+      description: Why would users or developers want this?

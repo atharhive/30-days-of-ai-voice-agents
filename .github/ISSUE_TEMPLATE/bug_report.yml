@@ -1,0 +1,26 @@
+name: Bug Report
+description: File a bug report for Meyme AI Voice Agent
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for filing a report! Please provide context on your environment.
+  - type: input
+    id: audio_hardware
+    attributes:
+      label: Microphone / Audio Hardware & Browser
+      placeholder: Chrome 122, MacBook M1 / Built-in mic
+    validations:
+      required: true
+  - type: textarea
+    id: issue_desc
+    attributes:
+      label: Description
+      description: What happened? Describe the latency, audio drop, or error.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Terminal Logs
+      description: Paste any server traceback or browser console errors.
